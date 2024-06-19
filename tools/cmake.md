@@ -409,8 +409,8 @@ int main(){
   - 加载模型  216ms
   - 图片前处理  9ms
   - 模型推理  11ms
-  - 在exe同级目录下要有：
-    - ![image-20240411104031558](E:\notes\cmake.assets\image-20240411104031558.png)
+  - 在exe同级目录下要有：    
+    - <img src="..\image_resources\image-20240411104031558.png" alt="image of depended_files" style="zoom:80%;">
 
 
 
