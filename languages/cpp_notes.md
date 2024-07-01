@@ -6,6 +6,8 @@
 # 类：
 
 - 一个类的构造函数中，**涉及在堆内存中创建变量**，则需要重载**复制构造函数(CopyConstructor)**和**赋值运算符（=）**和**析构函数（~T）**回收资源
+- 将类的构造函数声明为 `explicit` 可以防止进行隐式类型转换；为了避免没有预想到Bug，通常要避免自定义类型的隐式类型转换；
+- 
 
 ## 静态绑定与动态绑定
 
@@ -316,6 +318,20 @@ int main() {
 
 在这个例子中，`ShellExecute` 函数将会调用系统默认的浏览器来打开指定的网页。如果你需要启动一个本地的可执行文件，也可以通过 `ShellExecute` 来实现，方法是将 `lpFile` 参数设置为相应的可执行文件的路径，比如 "C:\path\to\program.exe"。
 
+## 计算函数运行耗时
+```cpp
+#include <iostream>
+#include <chrono>
+
+int main(){
+    auto start = std::chrono::high_resolution_clock::now();
+    someTask();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> t = end - start;
+    cout << "cost: " << t.count() << endl;
+}
+```
+
 # overload override
 
 The terms "overload" and "override" are often used in the context of object-oriented programming, particularly in languages like Java, C++, C#, and others. Here is the difference between the two:
@@ -420,4 +436,22 @@ extern "C" __declspec(dllexport) void AddPoints(const void* p1, const void* p2, 
     img.Dispose();
     ```
 
-  - 
+
+
+# Effective C++
+
+## Item 1: View C++ as a federation of languages
+- 可以将C++理解为基于四种语句的联合
+  - C，保留了C的语句、预处理、内建数据类型、数组、指针等；
+  - Object-Oriented C++ 具有类、封装、继承、多态、虚函数（动态绑定）
+  - Template C++ 模板编程
+  - STL  容器、迭代器、算法、函数对象
+  
+- 根据不同的业务场景，思路转换到适当的语言风格；
+
+## Item 2: Prefer consts, enums, and inlines to #defines
+- 更倾向于编译器，而不是预处理器
+
+## Item 3: Use const whenever possible
+- 尽量使用 `const` 修饰；
+
