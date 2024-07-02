@@ -451,7 +451,35 @@ extern "C" __declspec(dllexport) void AddPoints(const void* p1, const void* p2, 
 
 ## Item 2: Prefer consts, enums, and inlines to #defines
 - 更倾向于编译器，而不是预处理器
+- 对于简单的常量，使用 `const` `enum` 而不是 `#define`
+- 对于简单的函数，使用 `inline function` 而不是 `#define` 宏函数
 
 ## Item 3: Use const whenever possible
 - 尽量使用 `const` 修饰；
+- 当 `const` 出现在 `*` **左侧**时，代表指针指向的内容为 `const`;
+- 当 `const` 出现在 `*` **右侧**时，代表指针本身为 `const`;
+- 当 `*` 左右两侧都有 `const` 时，代表 指针 和指针指向的内容 都是 `const` 
+    ```cpp
+    char greeting[] = "Hello";
+    char* p = greeting;  // non-const pointer, non-const data
+    const char* p = greeting;  // non-const pointer, const data
+    char* const p = greeting; // const pointer, non-const data
+    const char* const p = greeting;  // const pointer, const data
+    ```
+- `const` 出现在变量**类型前后没有差别**
+  ```cpp
+  void func1(const Widget* pw);
+  void func2(Widget const* pw);  // 与上一个声明一致
+  ```
+- `STL` 中的 `iterator` 就是指针
+  ```cpp
+  const std::vector<int>::iterator iter = vec.begin();  // 类似 T* const
+  *iter = 10;  // OK 可以改变指向的内容；
+  ++iter;  // Error  不可以改变指针；
 
+  std::vector<int>::const_iterator cIter = vec.begin(); // 类似 const T*
+  *cIter = 10;  // Error  不可以改变内容
+  ++cIter;  // OK 可以改变指向
+  ```
+
+## Item 4: Make sure that objects are initialized before they are used
