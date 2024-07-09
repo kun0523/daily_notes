@@ -25,3 +25,9 @@ if __name__ == "__main__":
 
 # CPP
 
+
+
+# 部署
+- 下载链接：`https://storage.openvinotoolkit.org/repositories/openvino/packages/`
+- `w_openvino_toolkit_windows_2023.2.0.13089` 版本发生在有的电脑上不能运行的问题，更换`w_openvino_toolkit_windows_2024.2.0.15519`版本后正常；
+- 
