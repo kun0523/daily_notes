@@ -62,9 +62,9 @@
 
 # CMake函数
 
-- set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+- `set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)`
   - 在Windows环境下，CMAKE 链接dll，需要加这个指令，以确保产生lib文件，用于链接
-- set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+- `set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)`
   - 设置二进制文件输出路径
 
 ## find_package
