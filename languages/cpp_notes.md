@@ -483,3 +483,68 @@ extern "C" __declspec(dllexport) void AddPoints(const void* p1, const void* p2, 
   ```
 
 ## Item 4: Make sure that objects are initialized before they are used
+- 如果类中成员变量是`const` 或 `reference` 则一定需要初值，不能被赋值，此时需要**只能使用列表初始化**的方式进行初始化
+
+## Item 5: Know what functions C++ silently writes and calls
+- 编译器默认为空类写4个方法：
+  - `copy` 构造函数
+  - `copy assignment` 操作符
+  - 析构函数
+  - default 构造函数
+  ```cpp
+  class Empty{};
+
+  // 等同于：
+  class Empty{
+  public:
+      Empty(){...}  // default construct
+      Empty(const Empty& rhs){...} // copy construct
+      ~Empty(){...}  // deconstruct
+
+      Empty& operator=(const Empty& rhs){...}  // copy assignment operator
+  }
+
+  // 方法调用
+  Empty e1;  // call default construct
+  Empty e2{e1}  // call copy construct
+  e2 = e1;  // call copy assignment
+  ```
+
+
+
+# Effective STL
+## Item 1：仔细选择容器
+
+- 标准STL序列容器：vector  string  deque  list
+- 标准STL关联容器: set   multiset   map   multimap
+- 建议选择方式：
+  - `vector` 是一种可以默认使用的序列类型
+  - `List`  当很频繁地对序列<font color=red>**中部**</font>进行插入和删除时使用
+  - `deque`  当大部分插入和删除发生在序列的<font color=red>**头或尾**</font>时使用
+
+- 考虑算法复杂度
+  - 连续内存容器（基于数组的容器）:`vector` `string` `deque`
+  - 基于节点的容器：`list`  `slist` `标准关联容器`
+
+## Item 2: 小心对 “容器无关代码” 的幻想
+- “容器无关” 是指 后续的代码可以兼容各种容器类型；
+- STL建立在泛化之上
+  - 数组泛化为容器，参数化了所包含的对象的类型；
+  - 函数泛化为算法，参数化了所用的迭代器的类型；
+  - 指针泛化为迭代器，参数化了所指向的对象的类型；
+
+## Item 3: 使容器里对象的拷贝操作轻量而正确
+- 拷进去，拷出来：向容器中添加一个对象，其实是你指定对象的拷贝，从容器中提取一个对象，取出的是一个对象的拷贝；
+- 容器中的元素移动，都是通过拷贝的方式进行的
+- 通过类的`拷贝构造函数 Widget(const Widget&)`和它的`拷贝赋值操作 Widget& operator=(const Widget&)`
+- **可能导致的问题**
+  - 如果容器中的对象，拷贝过程很昂贵，那么容易造成性能瓶颈
+  - 如果以基类创建容器，<font color=red>向容器中插入派生类对象时，派生部分会丢失！</font>
+  - 较好的解决方法是，创建一个<font color=clane>对象指针的容器</font>
+  - 更好的解决方法是，使用智能指针的容器？
+
+## Item 4: 使用`empty`来代替检查`size()`是否为0
+- 对于所有的标准容器，`c.empty()`是一个常数时间的操作，对于一些`list` `c.size()` 是线性时间操作；
+
+## Item 5: 尽量使用区间成员函数
+- 区间成员函数：使用两个迭代器参数来指定元素的一个区间，来进行某个操作

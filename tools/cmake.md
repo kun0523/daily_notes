@@ -1,5 +1,5 @@
+
 - [官方教程][https://cmake.org/cmake/help/latest/guide/tutorial/index.html]
-- 
 - 在命令行中编译	
   - cmake  dir/to/CMakeList
   - cmake --build .
@@ -83,12 +83,13 @@
 # CMake Command
 
 - `set(VarName varVal)`  创建变量
+b1244ee4e1e669f15e328a17338bdab1a5afc039
 - `set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)`
   - 在Windows环境下，CMAKE 链接dll，需要加这个指令，以确保产生lib文件，用于链接
 - `set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)`
   - 设置二进制文件输出路径
 
-- `message(STATUS "Hello, Cmake")` 
+- `message(STATUS "Hello, Cmake")`
   - STATUS, WARNING, ERROR
 
 - 创建函数
