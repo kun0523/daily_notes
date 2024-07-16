@@ -25,6 +25,28 @@ if __name__ == "__main__":
 
 # CPP
 
+## openvino runtime
+1. 创建 core
+2. 创建 compiled_model
+3. 创建 infer_request
+4. 设置输入图像
+5. 推理
+6. 解析输出结果
+
+## 图像前处理
+### 分类问题常用的图像前处理：
+```cpp
+
+    size_t model_input_width = 224;
+    size_t model_input_height = 224;
+    cv::Mat rgb, blob;
+    cv::cvtColor(org_img, rgb, cv::COLOR_BGR2RGB);
+    cv::resize(rgb, blob, cv::Size(model_input_width, model_input_height));
+    blob.convertTo(blob, CV_32F);
+    blob = blob / 255.0;
+    cv::subtract(blob, cv::Scalar(0.485, 0.456, 0.406), blob);
+    cv::divide(blob, cv::Scalar(0.229,0.224,0.225), blob);  
+```
 
 
 # 部署

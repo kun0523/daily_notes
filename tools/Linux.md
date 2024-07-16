@@ -74,3 +74,32 @@
 - 怎么创建用户，限制其权限？
 - 一个用户创建的文件或文件夹，是否能做到其他用户不能访问？
 
+# WSL
+
+- wsl 更新 `wsl --update`  在`powershell`中进行
+- 查看wsl版本信息 `wsl -v`
+- 查看有哪些用户 ``
+## 怎么安装cuda驱动
+
+## 怎么创建多用户
+
+## 怎么多用户远程登陆
+
+## 怎么远程访问wsl进行本地开发
+
+## 案例
+
+- TODO 办公室网络不行，需要在家实现
+### root用户搭建paddle环境，普通用户使用框架进行训练
+1. 创建新用户
+   1. `sudo useradd -m username`  -m 会自动创建家目录
+   2. `sudo passwd username`  给用户名创建密码
+   3. `less /etc/passwd`  查看当前都有哪些用户
+   4. `sudo usermod -aG groupname username`  将指定用户添加到指定组中
+2. 使用conda安装paddle环境
+3. 使用root用户创建多个普通用户，创建普通用户组
+4. 使用普通用户登录
+5. 使用git clone 代码
+6. 上传数据集 / 使用本地数据集
+7. 进行模型训练
+8. 模型精度验证

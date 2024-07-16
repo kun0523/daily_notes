@@ -1,6 +1,7 @@
 # PaddlePaddle
 
 ## PaddleCls
+
 ### 环境搭建
 - `conda create -n paddle_cls_env python=3.8 -y`
 - `conda activate paddle_cls_env`
@@ -68,6 +69,22 @@ Metric|描述评价指标
 
 
 ### CPP Inference
+
+## PaddleDetection
+
+### 环境搭建
+- `conda create -p d:\envs\paddle_det_env python=3.10`
+- `conda activate d:\envs\paddle_det_env`
+- `pip install paddlepaddle-gpu==2.6.1 -i https://pypi.tuna.tsinghua.edu.cn/simple`
+- `cd /d e:\paddle\paddledet` cd 到 `PaddleDetection` 项目下
+- `pip install -r requirements.txt`
+  - 注意 `numpy` 版本 `numpy<1.24.0` 过高版本会导致后续安装失败
+- `python install paddledet`
+- `python ppdet/modeling/tests/test_architectures.py`  测试安装是否成功
+- `python E:\paddle\paddledet\tools\infer.py -c E:\paddle\paddledet\configs\ppyolo\ppyolo_r50vd_dcn_1x_coco.yml -o use_gpu=false --infer_img=E:\paddle\paddledet\demo\000000014439.jpg -o weights=E:\Pretrained_models\paddle_det\ppyolo_r50vd_dcn_1x_coco.pdparams`  执行一次推理，测试模型效果
+
+
+### 训练
 
 ## PaddleOCR
 ### 环境搭建
