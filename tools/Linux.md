@@ -1,6 +1,6 @@
 # Linux相关
 
-- 进度 `ch04 - 013`  complete
+- 进度 `ch04 - 016`  complete
 
 ## 基础命令
 
@@ -64,6 +64,8 @@
 - `ls file[0-9][0-9].txt`
 - `ls file?[A-Z].txt`  `?` 只匹配`一个任意字符`
 
+### 创建
+
 - `Brace Comprehension`
   - `mkdir 2014` 创建文件夹 名为2014，不能创建嵌套文件夹
   - `mkdir -p 2014/07/14/test` 创建完整的文件夹路径
@@ -71,15 +73,34 @@
   - `mkdir {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2022}`
   - `touch {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2020}/file_{001..010}`  在每个文件夹下产生文件
   - `ls {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2020}` 查看每个目录下的内容
+
+### 删除
+
 - `rm` 删除
   - 删除文件  `rm file_name`
   - 删除文件夹  `rm -r dir_name`
   - `rm -ri dir_name`  在删除之前逐个进行询问
   - `rmdir dir_name/*` 删除指定文件夹下的所有的**空文件夹**
+
+### 复制
+
 - 复制和移动文件
-  - null
+  - `cp file1.txt file2.txt destination/`
+    - 注意要复制到的地方**不需要加文件名**；
+  - `cp -r src_dir/ destination_dir/`
+    - 可以直接把整个文件夹拷贝到其他目录下；
+
+### 移动
+
+- `mv oldname.txt newname.txt`
+- `mv src_dir/* .`  把源路径下的所有文件都移动到当前路径下
+- `mv ~/Document/old_dir/ ./new_dir`  移动指定文件夹并同时改名字
+
+### 编辑
+
 - 编辑文件
-  - null
+  - 使用 `nano`
+  - 
 
 ## Shell
 
