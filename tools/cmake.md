@@ -1,19 +1,33 @@
+
 - [官方教程][https://cmake.org/cmake/help/latest/guide/tutorial/index.html]
-- 
 - 在命令行中编译	
   - cmake  dir/to/CMakeList
   - cmake --build .
 
-
+- `ch05--08`
 
 - `ctrl+shift+p` 
 - `CMake:Config`
 - `CMake:Scan for Kits `
 - `CMake: Select a Kit`
 
+- `mingw-64` 下载路径：`https://github.com/niXman/mingw-builds-binaries/releases`
+  - `x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0.7z`
 
 
 # CMake变量
+
+- CMake中支持的变量类型：
+  - `String`
+  - `Number`
+  - `List`  使用空格 或 分号 分隔
+  - `Path`
+  - `Boolean`
+    - TRUE ON YES Y 1 
+    - FALSE OFF NO N 0 IGNORE NOTFOUND
+    - `if()  elseif()  else()  endif()`
+    - `AND OR NOT`
+    - `GREATER LESS IN_LIST STREQUAL`
 
 - 通过 set 设置变量，允许后续用户修改对应的值，例如依赖库的位置、选择机器架构等
 - `set(<variable> <value> CACHE <type> <docstring>)`
@@ -25,8 +39,14 @@
   5. INTERNAL    无GUI 入口，用于开发者设定好的变量，不允许用户修改
 - 用户选择的结果，会以 key-value pairs 的方式，保存在 CMakeCache.txt 中
 
+- 从命令行传参：
+  - `cmake -S . -B build_dir -DMY_OUTSIDE_VAR=5`  外部定义变量以 `-D` 开头
+  - `message(STATUS ${MY_OUTSIDE_VAR})` 打印外部定义的变量
 
-
+- CMake内建的变量
+  - `PROJECT_NAME` 
+  - 都有哪些内建变量：`https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html`
+  - 
 - 定义预处理符号
 
   - add_definitions
@@ -60,12 +80,20 @@
   - `file(COPY someexe/res.txt DESTINATION Debug)`
   - 
 
-# CMake函数
+# CMake Command
 
+- `set(VarName varVal)`  创建变量
+b1244ee4e1e669f15e328a17338bdab1a5afc039
 - `set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)`
   - 在Windows环境下，CMAKE 链接dll，需要加这个指令，以确保产生lib文件，用于链接
 - `set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)`
   - 设置二进制文件输出路径
+
+- `message(STATUS "Hello, Cmake")`
+  - STATUS, WARNING, ERROR
+
+- 创建函数
+  - `function(my_func argument)   endfunction()`
 
 ## find_package
 
