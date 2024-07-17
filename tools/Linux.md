@@ -119,3 +119,26 @@
 6. 上传数据集 / 使用本地数据集
 7. 进行模型训练
 8. 模型精度验证
+
+# `vi` or `vim`
+![vim_command](../image_resources/vim_command.png)
+
+# SSH 连接
+- 安装ssh功能
+  - `sudo apt install openssh-server -y`
+  - `sudo systemctl start ssh`  开启SSH服务
+  - `sudo systemctl status ssh`  查看 SSH 状态
+  - `sudo ufw allow ssh`  开启防火墙？？
+  - `sudo ufw allow 22`  开启22端口
+  - `sudo ufw status`  查看开启的状态
+  - `sudo apt install net-tools -y`  安装 ifconfig 网络工具包
+- 登录命令 `ssh -p 34655 root@ssh.intern-ai.org.cn -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null`
+  - `StrictHostKeyChecking=no UserKnownHostsFile=/dev/null`  绕过指纹检查
+- 输入登录密码： 密码是怎么获取的？？
+  
+## vscode 使用 SSH 连接
+- vscode 安装 `Rmote-SSH`
+- `Romote Explorer` >> `Remotes Tunnels/SSH` >> `+ New Remote` >> 输入上述登录命令 >> connect >> 输入密码
+- 打开远程路径：`Explorer` >> 打开文件夹 
+- `ctrl+shift+~` 打开终端，可以直接在远程服务器中的环境中执行代码
+- vscode 端口映射：将远程服务器的进程端口映射到本地  vscode >> `PORTS`  程序运行后会自动建立映射关系
