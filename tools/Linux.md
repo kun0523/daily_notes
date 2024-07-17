@@ -5,6 +5,7 @@
 ## 基础命令
 
 - **Linux**中的命令是**大小写敏感**的（Windows中命令大小写不敏感）
+- `lsb_release -a`  查看ubuntu的系统信息
 - `clear`  清屏  `ctrl+L` 也可以
 - `history`  查看历史命令
 - `date`  查看当前日期时间
@@ -63,24 +64,27 @@
 - `ls file[1234567890].txt`  `ls file[0-9].txt`
 - `ls file[0-9][0-9].txt`
 - `ls file?[A-Z].txt`  `?` 只匹配`一个任意字符`
+- `ls` 参数说明 (注意大小写)
+  - `-a`  显示所有文件和目录
+  - `-l`  以长格式显示详细信息
+  - `-h`  以人类可读的方式显示文件大小
+  - `-R`  递归列出子目录的内容
+  - `-t`  按文件修改时间排序显示
 
 ### 创建
-
-- `Brace Comprehension`
-  - `mkdir 2014` 创建文件夹 名为2014，不能创建嵌套文件夹
-  - `mkdir -p 2014/07/14/test` 创建完整的文件夹路径
-  - `mkdir {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017,2018,2019,2020}` 产生多个文件夹
-  - `mkdir {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2022}`
-  - `touch {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2020}/file_{001..010}`  在每个文件夹下产生文件
-  - `ls {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2020}` 查看每个目录下的内容
+- `mkdir 2014` 创建文件夹 名为2014，不能创建嵌套文件夹
+- `mkdir -p 2014/07/14/test` 创建完整的文件夹路径
+- `mkdir {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017,2018,2019,2020}` 产生多个文件夹
+- `mkdir {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2022}`
+- `touch {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2020}/file_{001..010}`  在每个文件夹下产生文件
+- `ls {jan,feb,mar,apr,may,jun,july,aug,sep,oct,nov,dec}_{2017..2020}` 查看每个目录下的内容
 
 ### 删除
 
-- `rm` 删除
-  - 删除文件  `rm file_name`
-  - 删除文件夹  `rm -r dir_name`
-  - `rm -ri dir_name`  在删除之前逐个进行询问
-  - `rmdir dir_name/*` 删除指定文件夹下的所有的**空文件夹**
+- 删除文件  `rm file_name`
+- 删除文件夹  `rm -r dir_name`
+- `rm -ri dir_name`  在删除之前逐个进行询问
+- `rmdir dir_name/*` 删除指定文件夹下的所有的**空文件夹**
 
 ### 复制
 
@@ -103,8 +107,39 @@
   - 
 
 ## Shell
+### 进程管理
+命令|含义|示例
+---|---|---
+ps | 查看正在运行的进程 | `ps aux`
+top | 动态显示正在运行的进程 | `top`
+pgrep | 查找匹配条件的进程，可以根据进程名、用户等条件查找进程 | `pgrep -u username`
+nice | 更改进程的优先级 数值越低 优先级越高 | `nice -n 10 long-running-command`
+nvidia-smi | 监控和管理NVIDIA GPU 设备 | `nvidia-smi -l 2` loop per 2s
+kill | 发送信号到指定的进程，通常用于杀死进程 | `kill PID`，  `kill -9 PID` 强制杀死进程
+
+- `nvidia-smi`
+- ![nvidia-smi 解释](../image_resources/nvidia-smi_explain.png)
+
 
 ## 开源软件使用
+
+### `Tmux`
+- 终端多路复用器，可以在多个终端之间轻松切换，分离它们（不会杀死它们，继续在后台运行），或者将它们重新连接到其他终端中
+- 安装 `apt install tmux`
+- `https://www.ruanyifeng.com/blog/2019/10/tmux.html`  教程
+
+### `conda`
+- `conda --version` 查看版本信息
+- 设置国内镜像
+  ```
+  #设置清华镜像
+  conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free
+  conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+  conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/pro
+  conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
+  ```
+- `conda config --show` 查看配置信息
 
 ## 用户权限管理
 
