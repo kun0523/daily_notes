@@ -104,7 +104,19 @@
 
 - 编辑文件
   - 使用 `nano`
-  - 
+  - `nano /etc/nanorc`  使用 `nano`  去编辑 `nano` 的配置文件
+    - `set linenumbers`  显示行号
+  - 快捷键：
+    - `^` 代表 `CTRL`
+    - `M-` 代表 `Alt`
+
+- 找文件：`locate` 命令
+  - `sudo apt install plocate`  安装结束或会自动创建数据库，对系统中的文件建立索引
+  - `locate -S` 显示数据库的信息 在哪，有多少文件夹，有多少文件等...
+    - 数据库默认**一天仅更新一次**
+  - `locate -e *.conf` 查询配置文件在哪，返回之前会确认文件是否还存在
+    - `locate --existing *.conf`
+  - `locate `
 
 ## Shell
 ### 进程管理
@@ -183,14 +195,15 @@ kill | 发送信号到指定的进程，通常用于杀死进程 | `kill PID`，
 - 安装ssh功能
   - `sudo apt install openssh-server -y`
   - `sudo systemctl start ssh`  开启SSH服务
+    - `sudo service ssh restart`
   - `sudo systemctl status ssh`  查看 SSH 状态
-  - `sudo ufw allow ssh`  开启防火墙？？
+  - `sudo ufw allow ssh`  防火墙允许ssh通过
   - `sudo ufw allow 22`  开启22端口
-  - `sudo ufw status`  查看开启的状态
+  - `sudo ufw status`  查看防火墙开启的状态
   - `sudo apt install net-tools -y`  安装 ifconfig 网络工具包
-- 登录命令 `ssh -p 34655 root@ssh.intern-ai.org.cn -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null`
+- 登录命令 `ssh -p 34655 user_name@ip_to_target_server -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null`
   - `StrictHostKeyChecking=no UserKnownHostsFile=/dev/null`  绕过指纹检查
-- 输入登录密码： 密码是怎么获取的？？
+- 输入登录密码： 密码是Linux登录用户的密码，也可以采用公钥的方式登录
   
 ## vscode 使用 SSH 连接
 - vscode 安装 `Rmote-SSH`
