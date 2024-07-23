@@ -10,7 +10,11 @@
 - `pip install paddlepaddle-gpu==2.6.1 -i https://pypi.tuna.tsinghua.edu.cn/simple`
 - `pip install paddleclas`
 
-### 数据集
+
+### 训练
+
+#### 数据集组织方式
+
 - `PaddleClas` 使用 `txt` 格式文件指定训练集和测试集
 - 通常 训练集 与 验证集 图像分别存放在两个文件夹中，`train_list.txt` 和 `val_list.txt` 存储标注信息
 - `train_list.txt`
@@ -24,7 +28,8 @@
   ...
   ```
 
-### 训练
+#### 配置文件
+
 - Configs
   
 字段名|功能
@@ -55,10 +60,12 @@ Metric|描述评价指标
   - `visualdl --logdir ./output`
 - 训练过程Log定制
 
-### 模型验证
+### 验证
+
+- ``
 - `python tools/infer.py -c ./ppcls/configs/quick_start/ResNet50_vd.yaml -o Infer.infer_imgs=dataset/flowers102/jpg/image_00001.jpg -o Global.pretrained_model=output/ResNet50_vd/best_model`
 
-### 模型导出
+### 推理部署
 - 刚训练完，保存到的是 `xxx.pdparams` 文件，导出得到三个文件 
   - `inference.pdmodel`  存储网络结构信息
   - `inference.pdiparams`  存储网络权重信息
@@ -67,8 +74,9 @@ Metric|描述评价指标
   - `python3 tools/export_model.py -c ./ppcls/configs/Products/ResNet50_vd_Aliproduct.yaml -o Global.pretrained_model=./product_pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained -o Global.save_inference_dir=./deploy/models/product_ResNet50_vd_aliproduct_v1.0_infer`
 - 导出 onnx
 
+#### 轻量化
 
-### CPP Inference
+#### CPP Inference
 
 ## PaddleDetection
 
@@ -86,12 +94,31 @@ Metric|描述评价指标
 
 ### 训练
 
+#### 数据集组织方式
+
+- 转为 `coco` 的形式
+  - `annotations/`
+    - `instance_train.json`  train数据集的标注信息
+    - `instance_val.json`  val数据集的标注信息
+  - `train/`  train数据集的图片与标注
+  - `val/`   val数据集的图片与标注
+  - `label_list.txt`  对象的类别标签，一个类别一行
+- 使用 `paddle` 提供的脚本，从 `LabelMe` 转为 `coco` 
+  - `python x2coco.py --dataset_type labelme --json_input_dir E:\DataSets\dents_det\cut_patches\with_dent --image_input_dir E:\DataSets\dents_det\cut_patches\with_dent --output_dir E:\DataSets\dents_det\cut_patches\coco_tmp --train_proportion 0.8 --val_proportion 0.2 --test_proportion 0.0`
+
+#### 训练过程可视化
+- 开启可视化服务
+  - `visualdl --logdir vdl_dir/scalar/ --host <host_IP> --port <port_num>`
+- 配置可视化项目
+
 #### 配置图像增强
 
 
 #### 配置优化器
 
 #### 配置模型
+- 迁移学习：
+  - 在模型配置文件中可以修改 `freeze_at` 参数，控制冻结的网络层
 
 #### 配置损失函数
 
@@ -115,6 +142,46 @@ Metric|描述评价指标
   - cls: `https://paddleocr.bj.bcebos.com/dygraph_v2.0/ch/ch_ppocr_mobile_v2.0_cls_infer.tar`
   - rec: `https://paddleocr.bj.bcebos.com/PP-OCRv4/english/en_PP-OCRv4_rec_infer.tar`
     - 英文字符字典: `https://gitee.com/paddlepaddle/PaddleOCR/raw/release/2.6/ppocr/utils/en_dict.txt`
+
+
+## 低代码平台 PaddleX
+
+### 安装
+
+- 使用docker环境
+- 使用命令行传参的方式，更新`config`文件中的配置项
+ 
+### 数据校验
+
+
+
+### 模型训练
+
+- `python main.py -c paddlex/configs/object_detection/PP-YOLOE_plus-S.yaml -o Global.mode=train -o Global.dataset_dir=./dataset/fall_det -o Train.num_classes=1 -o Global.device=gpu:0`
+
+### 模型评估
+- `python main.py -c paddlex/configs/object_detection/PP-YOLOE_plus-S.yaml -o Global.mode=evaluate -o Global.dataset_dir=./dataset/fall_det -o Global.device=gpu:0`
+
+### 模型推理
+- `python main.py -c paddlex/configs/object_detection/PP-YOLOE_plus-S.yaml  -o Global.mode=predict -o Predict.model_dir=output/best_model -o Predict.input_path=https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/fall.png`
+
+### 实战营打卡记录
+#### 第一天
+
+- 模型推理测试日志
+  - ![测试日志](../image_resources/paddlex_log_snap.png)
+- 模型推理结果可视化
+  - ![推理结果](../image_resources/paddlex_demo_fall.png)
+
+#### 第二天
+
+- 数据校验日志
+  - ![数据校验日志](../image_resources/paddlex_datacheck.png)
+- 模型训练日志
+  - ![模型训练日志](../image_resources/paddlex_traindemo.png)
+- 模型评估日志
+  - ![模型评估日志](../image_resources/paddlex_evaldemo.png)
+
 
 
 ## 部署（FastDeploy）

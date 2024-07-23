@@ -1,5 +1,22 @@
 # Windows
 
+- 快速打开环境变量
+  - `win+R`  >> `sysdm.cpl`
+  
+## BAT脚本
+
+- 命令换行 `^`
+  - 注意 `^` 符号后不能有其他字符，包括空白符（空格 Tab 等）
+  ```bash
+  python E:/paddle/paddledet/tools/train.py ^
+    -c ./rtdetr/configs/rtdetr_r34vd_6x_coco_dent.yml ^
+    -o save_dir=dent_det/rtdetr_output1 ^
+    -o epoch=5 ^
+    --use_vdl=true ^
+    --vdl_log_dir=vdl_dir/scalar ^
+    --eval
+  ```
+
 ## 遇到过的问题
 
 ### 1. 可以远程但是忘记了登录密码
