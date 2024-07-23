@@ -112,11 +112,19 @@
 
 - 找文件：`locate` 命令
   - `sudo apt install plocate`  安装结束或会自动创建数据库，对系统中的文件建立索引
-  - `locate -S` 显示数据库的信息 在哪，有多少文件夹，有多少文件等...
+  - `locate -S` 显示数据库的信息 在哪，有多少文件夹，有多少文件等... ?? 命令不对
     - 数据库默认**一天仅更新一次**
   - `locate -e *.conf` 查询配置文件在哪，返回之前会确认文件是否还存在
     - `locate --existing *.conf`
-  - `locate `
+  - `locate fileName` 根据数据库来返回文件位置，速度快，但是需要更新数据库索引
+  - `sudo updatedb`  更新数据库对文件的索引
+- 找文件：`find` 命令
+  - 不需要根据数据库，所以更实时，但是查找的速度会慢一些
+  - `find . -maxdepth 1 -type f -size +10k -name "*.conf"`
+    - `-maxdepth` 要遍历查找的深度
+    - `-type`  要查找的类型  f 文件  d 文件夹
+    - `-size`  指定要查找的文件大小
+    - `-name` 指定要查找的文件名称
 
 ## Shell
 ### 进程管理

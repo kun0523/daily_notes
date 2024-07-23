@@ -1,5 +1,11 @@
 # Windows
 
+## WSL
+
+- `wsl --version`  查看 wsl 版本，如果没有正确返回值，说明还没安装wsl
+- `wsl --install`
+- `wsl --list -v` 当前系统中已经安装好的版本
+
 ## 遇到过的问题
 
 ### 1. 可以远程但是忘记了登录密码
@@ -9,9 +15,17 @@
   - 用户账户 >> 管理账户 >> 更改密码
 
 ### 2. WSL 忘了用户密码
+
+> 方法一
+
 - windows中可以直接把`root`用户设置为默认用户，在`root`下修改其他用户密码
 - `ubuntu1804 config --default-user root`  使用管理员开启`powershell`中运行
   - 不同的发行版，命令中的第一项需要进行相应的修改，例如使用的是`ubuntu 20.04`版本，就修改为`ubuntu2004 config --default-user root`
 - 在`root`用户下修改指定用户的密码
   - `passwd user_name` : `user_name` 指定为你要修改的用户名，输入两遍新的密码即可修改完成
 - 再次把默认用户修改为原来的用户
+
+> 方法二
+
+- 查看自己安装的发行版版本`wslconfig /l`
+- 以管理员进入wsl `wsl.exe -d Ubuntu -user root`
