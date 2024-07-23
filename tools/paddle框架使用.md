@@ -146,12 +146,39 @@ Metric|描述评价指标
 
 ## 低代码平台 PaddleX
 
+- Paddlex工作流程
+![Paddlex工作流程](../image_resources/paddlex_workflow.png)
+- Paddlex支持的产线类型
+  - 图像分类、目标检测、语义分割、实例分割
+  - 结构分析、表格识别、文本检测、文本识别
+  - 时间序列的分类、预测、异常检测
+  
 ### 安装
 
 - 使用docker环境
+  - `docker run --gpus all --name ubuntu --privileged --network=host -p 2222:22 -v E:\paddle\paddlex:/home/paddlex -it <image_id> /bin/bash`
+  - 使用的镜像版本：`paddle:3.0.0b1-gpu-cuda11.8-cudnn8.6-trt8.5`
 - 使用命令行传参的方式，更新`config`文件中的配置项
  
 ### 数据校验
+
+- 数据集格式说明：`https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta/docs/tutorials/data/dataset_format.md`
+- 分类问题
+  ```plain
+  dataset_dir    # 数据集根目录，目录名称可以改变
+  ├── images     # 图像的保存目录，目录名称可以改变，但要注意与train.txt、val.txt的内容对应
+  ├── label.txt  # 标注id和类别名称的对应关系，文件名称不可改变。每行给出类别id和类别名称，内容举例：45 wallflower
+  ├── train.txt  # 训练集标注文件，文件名称不可改变。每行给出图像路径和图像类别id，使用空格分隔，内容举例：images/image_06765.jpg 0
+  └── val.txt    # 验证集标注文件，文件名称不可改变。每行给出图像路径和图像类别id，使用空格分隔，内容举例：images/image_06767.jpg 10  
+
+  // label.txt 组织方式：
+  0 classname1
+  1 classname2
+  2 classname3
+  ...
+  ```
+
+- 目标检测问题
 
 
 

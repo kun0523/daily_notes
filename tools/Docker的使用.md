@@ -79,9 +79,6 @@
     - `paddlex --install`  安装成功后会显示 "All packages are installed."
   - 测试模型效果
     - `paddlex --pipeline object_detection --model PP-YOLOE_plus-S --input https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/fall.png`
-    - 官方模型推理后的日志截图
-    - ![PaddlexDetectLog](../image_resources/paddlex_log_snap.png)
-    - 推理后的结果图
-    - ![PaddlexDet Demo Fall](../image_resources/paddlex_demo_fall.png)
+    - 
   
 #### 使用 `SSH` 访问
