@@ -126,6 +126,34 @@
     - `-size`  指定要查找的文件大小
     - `-name` 指定要查找的文件名称
 
+### 打包
+
+- `tar -cvf my_archive.tar file[1-5].txt`
+  - `c` create  创建 `tar ball`
+  - `v` verbose 显示详细信息
+  - `f` target archive file  指定最终的打包文件名 
+- `tar -tf my_archive.tar` 查看 `tar ball` 中都有什么
+  - `-t` test 
+- `tar -xvf my_archive.tar` 解包
+  - `-x` extract 解包
+- 压缩
+  - `gzip`  速度快，压缩率差一点
+    - `gzip my_archive.tar`
+    - `gunzip my_archive.tar.gz`  还原 `tarball`
+  - `bzip2`  速度慢一些，压缩率更好
+    - `bzip2 my_archive.tar`
+    - `bunzip2 my_archive.tar.bz2`  还原 `tarball`
+  - `zip`
+    - `zip my_zip.zip file1 file2 file3`
+    - `unzip my_zip.zip`
+- 一步打包并压缩
+  - `tar -cvzf my_archive.tar.gz file[1-5].txt`
+    - `-z` 代表使用 `gzip` 算法
+  - `tar -cvjf my_archive.tar.bz2 file[1-5].txt`
+    - `-j` 代表使用 `bzip2` 算法
+  - `tar -xvzf my_archive.tar.gz`
+  - `tar -xvjf my_archive.tar.bz2`
+
 ## Shell
 ### 进程管理
 命令|含义|示例
