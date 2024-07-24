@@ -185,6 +185,10 @@ Metric|描述评价指标
 ### 模型训练
 
 - `python main.py -c paddlex/configs/object_detection/PP-YOLOE_plus-S.yaml -o Global.mode=train -o Global.dataset_dir=./dataset/fall_det -o Train.num_classes=1 -o Global.device=gpu:0`
+- 训练配置参数的优先级：
+  1. 命令行追加 `-o` 参数，如：`-o Global.mode=train`；
+  2. 编辑 `paddlex/configs/` 目录下对应的 yaml 配置文件，如 `paddlex/configs/image_classification/ResNet50.yaml`；
+  3. 编辑 `paddlex/repo_apis/xxx_api/configs/` 目录下的 yaml 配置文件，如 `paddlex/repo_apis/PaddleClas_api/configs/ResNet50.yaml`；
 
 ### 模型评估
 - `python main.py -c paddlex/configs/object_detection/PP-YOLOE_plus-S.yaml -o Global.mode=evaluate -o Global.dataset_dir=./dataset/fall_det -o Global.device=gpu:0`
@@ -209,6 +213,24 @@ Metric|描述评价指标
 - 模型评估日志
   - ![模型评估日志](../image_resources/paddlex_evaldemo.png)
 
+#### 第三天
+- 5次训练Log
+  - ![paddlex_fall_det_train5](../image_resources/paddlex_fall_det_train5.png)
+- 5次评估结果
+  - ![paddlex_fall_det_evl5](../image_resources/paddlex_fall_det_evl5.png)
+
+- 学习率调整
+  |训练轮次|训练卡数|批大小|训练学习率|mAP@0.5|
+  |---|---|---|---|---|
+  |50|1|8|0.00005|**0.946**|
+  |50|1|8|0.0001|0.935|
+  |50|1|8|0.0002|0.912|
+- 轮次调整
+  |训练轮次|训练卡数|批大小|训练学习率|mAP@0.5|
+  |---|---|---|---|---|
+  |50|1|8|0.00005|**0.946**|
+  |30|1|8|0.00005|0.933|
+  |80|1|8|0.00005|0.929|
 
 
 ## 部署（FastDeploy）
