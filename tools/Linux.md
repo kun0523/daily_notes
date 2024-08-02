@@ -1,6 +1,6 @@
 # Linux相关
 
-- 进度 `ch04 - 016`  complete
+- 进度 `ch06 - 004`  complete
 
 ## 基础命令
 
@@ -155,6 +155,7 @@
   - `tar -xvjf my_archive.tar.bz2`
 
 ## Shell
+
 ### 进程管理
 命令|含义|示例
 ---|---|---
@@ -168,6 +169,20 @@ kill | 发送信号到指定的进程，通常用于杀死进程 | `kill PID`，
 - `nvidia-smi`
 - ![nvidia-smi 解释](../image_resources/nvidia-smi_explain.png)
 
+### bash
+
+- 编写`bash`脚本
+  - 第一行写 `#!/bin/bash`  指定使用的翻译器，同理python脚本可以写 `#!/bin/python`
+  - 让bash可执行 `chmod +x script.sh`
+  - 添加环境变量
+    - `nano ~/.bashrc`  
+    - `PATH="$PATH:$HOME/path/to/script.sh"`
+- 定时执行 `cron`
+  - `crontab -e`  创建定时任务
+  - `m(minutes) h(hours-24) dom(dayofmonth) mon(month) dow(dayofweek) com`
+  - 例如 `* * * * * echo "hello world!" >> ~/hello.txt`  每一分钟都往文件中写入一行 "hello world!"
+  - `*/5 * * * * xxx` 每5min 执行一次
+  - 可用于定期执行文件备份操作 `59 23 * * FRI bash ~/bin/backup`
 
 ## 开源软件使用
 
