@@ -49,37 +49,53 @@
 
 - 案例: 解析论文回答问题
 - 选用论文：CatVTON: Concatenation Is All You Need for Virtual Try-On with Diffusion Models
-- 示例代码：
- ```python
- from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.llms.huggingface import HuggingFaceLLM
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+- 不使用RAG的示例代码：
+  ```python
+  from llama_index.llms.huggingface import HuggingFaceLLM
+  from llama_index.core.llms import ChatMessage
+  
+  llm = HuggingFaceLLM(
+    model_name = "/share/new_models/Shanghai_AI_Laboratory/internlm2-chat-1_8b",
+    tokenizer_name="/share/new_models/Shanghai_AI_Laboratory/internlm2-chat-1_8b",
+    model_kwargs={"trust_remote_code":True},
+    tokenizer_kwargs={"trust_remote_code":True}
+  )
 
-# 用于将文本转换为向量表示
-embed_model = HuggingFaceEmbedding(
+  rsp = llm.chat(messages=[ChatMessage(content="介绍模型'CatVTON'可以运用在什么场景，有什么用处，能达到什么效果")])
+  print(rsp)
+  ```
+- 使用RAG的示例代码：
+  
+  ```python
+  from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+  from llama_index.llms.huggingface import HuggingFaceLLM
+  from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
+
+  # 用于将文本转换为向量表示
+  embed_model = HuggingFaceEmbedding(
     model_name = "/root/tasks/task_L1/03LlamaIndex/model/sentence-transformer/"
-)
+    )
 
-# 将创建的Embed模型赋值给全局的embed_model属性
-Settings.embed_model = embed_model
+  # 将创建的Embed模型赋值给全局的embed_model属性
+  Settings.embed_model = embed_model
 
-llm = HuggingFaceLLM(
+  llm = HuggingFaceLLM(
     model_name="/share/new_models/Shanghai_AI_Laboratory/internlm2-chat-1_8b",
     tokenizer_name="/share/new_models/Shanghai_AI_Laboratory/internlm2-chat-1_8b",
     model_kwargs={"trust_remote_code":True},
     tokenizer_kwargs={"trust_remote_code":True}
-)
-Settings.llm = llm
+    )
+  Settings.llm = llm
 
-# 从指定目录读取所有文档，并加载数据到内存中
-documents = SimpleDirectoryReader("/root/tasks/task_L1/03LlamaIndex/data/").load_data()
-# 创建一个VectorStoreIndex，并使用之前加载的文档来构建索引，此索引将文档转换为向量，并存储这些向量以便快速检索
-index = VectorStoreIndex.from_documents(documents)
-# 创建一个查询引擎，这个引擎可以接收查询并返回相关文档的响应
-query_engine = index.as_query_engine()
-response = query_engine.query("介绍模型'CatVTON'可以运用在什么场景，有什么用处，能达到什么效果")
-print(response)
- ```
+  # 从指定目录读取所有文档，并加载数据到内存中
+  documents = SimpleDirectoryReader("/root/tasks/task_L1/03LlamaIndex/data/").load_data()
+  # 创建一个VectorStoreIndex，并使用之前加载的文档来构建索引，此索引将文档转换为向量，并存储这些向量以便快速检索
+  index = VectorStoreIndex.from_documents(documents)
+  # 创建一个查询引擎，这个引擎可以接收查询并返回相关文档的响应
+  query_engine = index.as_query_engine()
+  response = query_engine.query("介绍模型'CatVTON'可以运用在什么场景，有什么用处，能达到什么效果")
+  print(response)
+   ```
  
 - 使用RAG前
 - ![non-use RAG](../image_resources/non-use-rag.png)
