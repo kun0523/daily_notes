@@ -1,8 +1,9 @@
 
 - [官方教程][https://cmake.org/cmake/help/latest/guide/tutorial/index.html]
-- 在命令行中编译	
+- 在命令行中编译
   - cmake  dir/to/CMakeList
-  - cmake --build .
+    - cmake -S . -B ./build  生成MakeFile
+  - cmake --build .   // 根据MakeFile编译生成可执行文件
 
 - `ch05--08`
 
@@ -29,8 +30,12 @@
     - `AND OR NOT`
     - `GREATER LESS IN_LIST STREQUAL`
 
+- 通过`message`可以打印信息
+  - `message("Hello, CMake!")`  
+  - `message(STATUS "Hello, CMake!")`  STATUS 控制输出的形式，还可以用`WARNING`  `FATAL_ERROR`(不执行后续操作)  `SEND_ERROR`(打印错误信息，可继续执行后续步骤)
 - 通过 set 设置变量，允许后续用户修改对应的值，例如依赖库的位置、选择机器架构等
-- `set(<variable> <value> CACHE <type> <docstring>)`
+  - `set(<variable> <value> CACHE <type> <docstring>)`  设置变量
+  - `message(STATUS ${variable})`  使用变量 `${var}`
 - 可选的type:
   1. FILEPATH    可以打开一个选择文件的窗口
   2. PATH            可以打开一个选择文件夹的窗口
@@ -42,6 +47,19 @@
 - 从命令行传参：
   - `cmake -S . -B build_dir -DMY_OUTSIDE_VAR=5`  外部定义变量以 `-D` 开头
   - `message(STATUS ${MY_OUTSIDE_VAR})` 打印外部定义的变量
+- 进行数据计算
+  - `math(EXPR <output_var> <expression>)`
+  - `math(EXPR NUM "${NUM}+1")`  将最后表达式的计算结果赋值给第二个参数`NUM`
+- 定义函数
+  ```cmake
+  function(my_fun my_param)
+    message(STATUS ${my_param})
+  endfunction()
+
+  my_fun(10)
+  ```
+- 定义宏 `marco`
+  - 可以直接访问全局变量，并修改全局变量
 
 - CMake内建的变量
   - `PROJECT_NAME` 
@@ -72,7 +90,18 @@
   - `option(USE_MYLIB "docstrings" ON)`
 
     - 在cmake时，通过 `cmake dir/to/cmakelists -DUSE_MYLIB=OFF`  设定
-    - 
+    - 为了加速编译过程，cmake会自动产生`CMakeCache.txt`文件，里面存了变量的值，直接改`CMakeLists.txt`文件并不会使`Cache`文件内容发生改变，需要手动删除后，重新生成
+  - `if`
+  
+    - ```cmake
+      option(BuildExample "wheather or not to build example" False)
+
+      if(BuildExample)
+          message(STATUS "Build Example")
+      endif()
+      ```
+
+    - `cmake -S . -B build -DBuildExample=True`  命令行中可以控制编译的过程
 
 
 
