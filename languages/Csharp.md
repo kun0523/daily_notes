@@ -593,6 +593,34 @@
 
 ### 线程
 
+- 耗时操作放在子线程中运行
+```c#
+Task.Run(()=>{
+  string html = webClient.DownloadString("https://www.hello.com");  // 阻塞；
+})
+```
+
+- 在子线程中执行完得到的结果，要回传给界面元素，需要创建委托
+```c#
+this.Invoke(new Action(()=>{
+  textBox1.Text = html;
+}));
+```
+
+- 也可以通过异步方法实现 （`async`   `await`）
+```c#
+# await 直接拿到 Task<T> 类型参数
+string html = await myDownloadAsync(url);
+textBox1.Text = html;
+
+private Task<string> myDownloadAsync(string url){
+  WebClient webClient = new WebClient();
+  return Task.Run(()=>{
+    return webClient.DownloadString(url);
+  });
+}
+```
+
 
   
 
