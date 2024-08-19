@@ -1,3 +1,62 @@
+# C#
+- aliyun-bei-3.1.1
+## 基础
+
+### CLR
+
+- Common Language Runtime  公共语言运行时
+- 底层的，统一运行各种语言的运行环境；
+- 设计目标：
+  - 简化开发：安全性、内存管理；（统一做内存管理，不需要自己释放内存）
+  - 简化应用程序部署；
+  - 基类库
+  - 支持多种语言；
+- 相当于Java中的虚拟机；
+- ![C#编译与执行](../image_resources/csharp_compile_run.png)
+  - exe文件中的内容：
+    - IL指令  Intermediate Language
+    - 元信息
+    - 反编译工具 ildasm.exe  可以用来对编译生成的exe文件进行反编译，可以查看各个函数指令
+
+### 面向对象
+
+#### 对象
+- 属性(Property): 
+  - 一个事物的**基本状态和特征**，
+  - 用名字或形容词
+- 方法(Method)：
+  - 指事物的**动作或功能**
+  - 用动词
+- 事件(Event)
+  - 指该对象与其他对象之间的**通知机制或消息机制**
+  - 用动词
+  - 通常用 `+=` 进行事件的注册
+
+#### 数据类型
+![csharp data structure](../image_resources/csharp_data_structure.png)
+
+- 值类型：
+  - `float`  4个字节， `3.14f`
+  - `double`  8个字节， `3.14   1.5e-3`
+  - `decimal`  16个字节 `120.50m`  注意数字后面加 `m`
+  - `char`  C# 中的字符使用 `Unicode` 表示，占两个字符 `\u0061`
+
+```C#
+Console.WriteLine("size of int value: {0}", sizeof(int));  // 4
+Console.WriteLine("size of Int32 value: {0}", sizeof(System.Int32));  // 4
+Console.WriteLine("size of long value: {0}", sizeof(long));  // 8
+
+Console.WriteLine("size of float value: {0}", sizeof(float));  // 4
+Console.WriteLine("size of double value: {0}", sizeof(double));  // 8
+
+Console.WriteLine("size of decimal value: {0}", sizeof(decimal));  // 16
+Console.WriteLine("size of char value: {0}", sizeof(char));  // 2
+Console.WriteLine("size of bool value: {0}", sizeof(bool));  // 1
+```
+
+- 引用类型：
+  - 
+
 # 编译
 
 - 编译器  csc.exe
@@ -449,8 +508,6 @@
   
   ```
 
-- 
-
 - C# 调用形式
 
 ```c#
@@ -461,6 +518,7 @@
         [DllImport(@"E:\cpp_proj\openvino_infer\bin\Debug\cls_infer_lib.dll", CallingConvention=CallingConvention.Cdecl)]
         private static extern int doInferenceByImgPth(string image_pth, IntPtr compiled_model, int[] roi, int roi_len, StringBuilder msg, int msg_len);
 ```
+
 - C# 中的CallingConvention
   - `CallingConvention.Cdecl`    C语言的调用方式
   - `CallingConvention.Fastcall`
@@ -495,10 +553,6 @@
         tbLog.AppendText($"Point: {i.x}  {i.y}" + Environment.NewLine);
     ```
 
-  - 
-
-
-
 ## c# 与 cpp 对应关系
 
 | cpp数据类型 | c#数据类型    | 备注                               |
@@ -508,14 +562,10 @@
 | int*        | int[ ]        | 传递数组时，要传数组长度           |
 | void*       | IntPtr        |                                    |
 
-
-
 ## Marshal
 
 - 用于在托管代码（managed code) 和非托管代码(unmanaged code) 之间进行数据转换和交互；
 - 主要用于处理不同内存布局或数据类型的转换；
-
-
 
 - 调用openvino时，如果用debug版本会出错！！用release版本OK，不知道为什么。。。
 
@@ -568,32 +618,30 @@
 
 - 变量名: camelCase,  `firstNameLabel`
 - 创建控件后，首先给控件命名（便于后续事件名与控件名关联）；
-- 
-- 
-
 
 ### 常用控件
 
 - `TabIndex`  使用 Tab 键跳转时的顺序；
 
 #### StatusStrip
+
 - 状态栏
 - 窗口最下缘，边框；
 - 用于提示信息
 
 #### MenuStrip
+
 - 菜单栏
 - 类似按钮，可以创建点击事件
 - 在`Text`属性中，插入`&`, 可以使用 `Alt+字母` 的方式快捷打开
   - 在日常软件使用中，也可以使用该特性，按住`Alt`键，此时菜单栏上的字母会出现下划线，点击对应的字母即可打开相应的标签；
 
-
 ### 常用布局
-
 
 ### 线程
 
 - 耗时操作放在子线程中运行
+  
 ```c#
 Task.Run(()=>{
   string html = webClient.DownloadString("https://www.hello.com");  // 阻塞；
@@ -601,6 +649,7 @@ Task.Run(()=>{
 ```
 
 - 在子线程中执行完得到的结果，要回传给界面元素，需要创建委托
+  
 ```c#
 this.Invoke(new Action(()=>{
   textBox1.Text = html;
@@ -608,6 +657,7 @@ this.Invoke(new Action(()=>{
 ```
 
 - 也可以通过异步方法实现 （`async`   `await`）
+  
 ```c#
 # await 直接拿到 Task<T> 类型参数
 string html = await myDownloadAsync(url);
@@ -620,13 +670,3 @@ private Task<string> myDownloadAsync(string url){
   });
 }
 ```
-
-
-  
-
-
-
-
-
-
-
