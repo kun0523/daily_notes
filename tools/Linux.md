@@ -6,6 +6,9 @@
 
 - **Linux**中的命令是**大小写敏感**的（Windows中命令大小写不敏感）
 - `lsb_release -a`  查看ubuntu的系统信息
+- `du -d 1 -h /target/dir` 查看指定路径下的文件对磁盘的占用情况
+  - `-d --max-depth=N` 指定查看的目录深度
+  - `-h` 返回的文件大小的单位改为 K  MB 等人好理解的格式
 - `clear`  清屏  `ctrl+L` 也可以
 - `history`  查看历史命令
 - `date`  查看当前日期时间
