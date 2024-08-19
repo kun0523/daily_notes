@@ -15,6 +15,10 @@
 - `sudo apt update`  更新 apt 索引
 - `sudo apt upgrade`  更新软件
 - `which echo`  查询指定命令的程序文件在什么路径下
+- `du [目录]` 显示指定目录机器子目录的磁盘使用情况
+  - du： disk usage
+  - `--max-depth=N`  仅显示指定深度的目录使用情况（N为层级数）
+  
 
 - 命令的结构
   - `commandName options inputs`  
@@ -188,6 +192,22 @@ kill | 发送信号到指定的进程，通常用于杀死进程 | `kill PID`，
   - 可用于定期执行文件备份操作 `59 23 * * FRI bash ~/bin/backup`
 
 ## 开源软件使用
+
+### 软件仓库 Repositories
+- `apt`: advance package manage tools
+- 根据关键字查找软件(离线查找缓存)： `apt-cache search python`
+- 查看指定软件的详细信息(离线查找缓存)： `apt-cache show python-colorama`
+- 更新缓存：`apt-get update`  get update from repositories
+- 更新软件：`apt-get upgrade`  
+- 安装软件：`apt-get install <package_name>`
+- 卸载软件：`apt-get purge <package_name>`
+- 
+
+### `CMake`
+- `cmake --version`  查看版本信息
+- `apt remove camke -y`  移除cmake
+- `pip install cmake --upgrade`  安装最新版camke
+
 
 ### `Tmux`
 - 终端多路复用器，可以在多个终端之间轻松切换，分离它们（不会杀死它们，继续在后台运行），或者将它们重新连接到其他终端中

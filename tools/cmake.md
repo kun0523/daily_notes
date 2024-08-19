@@ -1,24 +1,36 @@
 
+# CMake
 - [官方教程][https://cmake.org/cmake/help/latest/guide/tutorial/index.html]
-- 在命令行中编译
-  - cmake  dir/to/CMakeList
-    - cmake -S . -B ./build  生成MakeFile
-  - cmake --build .   // 根据MakeFile编译生成可执行文件
 
-- `ch05--08`
+- `CMake, Tests and Tooling for CC++ Projects [2022 Edition] ch02--09`
 
-- `ctrl+shift+p` 
-- `CMake:Config`
-- `CMake:Scan for Kits `
-- `CMake: Select a Kit`
+## VSCode 使用
+- 安装扩展：`C/C++ Extension Pack`  
+- `ctrl+shift+p`  打开指令窗口快捷键
+- `CMake:Config`  自动配置cmake环境
+- `CMake:Scan for Kits `  扫描系统中已有的编译器
+- `CMake: Select a Kit`  选择一个编译器
 
-- `mingw-64` 下载路径：`https://github.com/niXman/mingw-builds-binaries/releases`
-  - `x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0.7z`
+- `mingw-64` 下载路径：`https://github.com/niXman/mingw-builds-binaries/releases/x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0.7z`
 
+## CMake 命令
 
-# CMake变量
+### CMake 命令行指定
+- 生成MakeFile  `cmake -S dir/to/src_files -B dir/to/make_files`
+- 编译项目： `cmake --build dir/to/make_files`
+  - `cmake --build dir/to/make_files --target target_name`  指定要编译的对象，可以只编译库文件
+- 使用脚本编译工程
+  - ```bash
+    rmdir /S /Q build
+    mkdir build
+    cmake -S . -B build -DCOMPILE_APP=ON 
+    cmake --build build --config Release  # 使用vscode时，需要在编译时指定是Debug还是Release
+    ```
 
-- CMake中支持的变量类型：
+### CMakeLists 指令
+
+#### 变量与函数的定义
+
   - `String`
   - `Number`
   - `List`  使用空格 或 分号 分隔
@@ -26,6 +38,7 @@
   - `Boolean`
     - TRUE ON YES Y 1 
     - FALSE OFF NO N 0 IGNORE NOTFOUND
+    - `option(<variable> <"help_text"> [value])`
     - `if()  elseif()  else()  endif()`
     - `AND OR NOT`
     - `GREATER LESS IN_LIST STREQUAL`
@@ -109,7 +122,6 @@
   - `file(COPY someexe/res.txt DESTINATION Debug)`
   - 
 
-# CMake Command
 
 - `set(VarName varVal)`  创建变量
 b1244ee4e1e669f15e328a17338bdab1a5afc039
@@ -123,69 +135,138 @@ b1244ee4e1e669f15e328a17338bdab1a5afc039
 
 - 创建函数
   - `function(my_func argument)   endfunction()`
+  
+#### 常用的预定义变量
 
-## find_package
-
-- 第三方库的作者以及维护好了  package_name.cmake 文件，例如 OpenVINOConfig.cmake
-- find_package(OpenVINO REQUIRED)
-- 配合 target_link_libraries 使用 链接动态库
-- 当你使用 `find_package` 导入一个库时，实际上是在告诉 CMake 去查找这个库的配置文件，通过这些配置文件，CMake 知道了库的具体安装位置和相关信息，从而能够正确地包含头文件和链接库，使得编译过程更加自动化和方便。
-
-
-
-## add_library
-
-- `add_library(lib_name source_file.cxx)` 
-- 在库目录的 CMakeLists 中使用，生成库文件
-
-## target_link_libraries
-
-- 是用来链接实际的库文件到目标上，它指定了要与目标一起链接的库。
-- 在 `add_executable()`  之后使用
-- 常用
-- 如果库文件的cmakelists中，使用了 interface，即不需要在主cmakelists中指定头文件路径
-  - `target_include_directories(MathFunctions INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})`  在库文件中指定，调用方仅需要使用 target_link_libraries，而不需要再指定头文件目录
-
-## target_include_directories
-
-- 指定查找库**头文件**的路径
-- 在 `add_executable()`  之后使用
-- 可多次使用，添加多个库目录
+- `PROJECT_NAME`  项目名称
+- `CMAKE_SOURCE_DIR` / `PROJECT_SOURCE_DIR`  项目根目录
+- `CMAKE_RUNTIME_OUTPUT_DIRECTORY`  编译生成的目录(将项目中生成的二进制文件存到该目录下)
+- `CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS`
+  - 当编译静态库（STATIC）时 不需要设置
+  - **当编译动态库（SHARED）时 需要设置为ON**
 
 
+#### 常用的预定义函数
 
-## target_link_directories
+- `include()`  导入`cmake`模块 （`xxx.cmake`）
 
-- `target_link_directories` 用于指定在链接过程中搜索库文件的目录，告诉链接器在这些目录中查找要链接的库。
+- find_package
+  - 第三方库的作者以及维护好了  package_name.cmake 文件，例如 OpenVINOConfig.cmake
+  - find_package(OpenVINO REQUIRED)
+  - 配合 target_link_libraries 使用 链接动态库
+  - 当你使用 `find_package` 导入一个库时，实际上是在告诉 CMake 去查找这个库的配置文件，通过这些配置文件，CMake 知道了库的具体安装位置和相关信息，从而能够正确地包含头文件和链接库，使得编译过程更加自动化和方便。
+
+- add_library
+  - `add_library(lib_name source_file.cxx)` 
+  - 在库目录的 CMakeLists 中使用，生成库文件
+
+- target_link_libraries
+  - 是用来链接实际的库文件到目标上，它指定了要与目标一起链接的库。
+  - 在 `add_executable()`  之后使用
+  - 常用
+  - 如果库文件的cmakelists中，使用了 interface，即不需要在主cmakelists中指定头文件路径
+    - `target_include_directories(MathFunctions INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})`  在库文件中指定，调用方仅需要使用 target_link_libraries，而不需要再指定头文件目录
+    - 
+- target_include_directories
+
+  - 指定查找库**头文件**的路径
+  - 在 `add_executable()`  之后使用
+  - 可多次使用，添加多个库目录
+
+- target_link_directories
+  - `target_link_directories` 用于指定在链接过程中搜索库文件的目录，告诉链接器在这些目录中查找要链接的库。
+
+- target_compile_definitions
+  - 将cmake中定义的变量 传递到源文件中
+  - `target_compile_definitions(MathFunctions PRIVATE "USE_MYMATH")`
+    - 将 `USE_MYMATH` 作为预定义的符号传入
+    - 可用于控制源文件中使用不同的实现方式
+
+- include_directories
+  - `include_directories` 指定了包含目录，以便编译器能够找到 `mylib.h` 头文件
+
+- aux_source_directory
+  - `aux_source_directory(<dir> <variable>)` 
+    - 将指定的 dir 中的源文件路径，保存在 variable 中
+    - variable 是一个列表
+
+## CPP项目文件管理
+
+- `CPP`工程目录结构
+  - ![C++工程目录结构](../image_resources/cpp_proj_tree.png)
+  - 
+
+- 版本号：`MajorVersion.MinorVersion.PatchVersion`
+  - `MajorVersion`  重大更新，可能不兼容之前的版本
+  - `MinorVersion`  新增小特性
+  - `PatchVersion`  BugFix
+
+- 在库目录下的`CMakeLists.txt` 写`target_include_directories(${PROJECT_NAME} PUBLIC .)` 可执行文件的源码中即可引入头文件
 
 
+- 使用`config_file`函数
+  - `config_file(<input_file> <output_file> )`
+  - 将输入文件中的`@VAR@`,替换为CMake中定义的变量，如果没有则是空字符串
+  - 用于将`CMakeLists.txt`中定义的信息，引入到工程中，例如`版本信息`
+  - ```cmake
+    # CMakeLists.txt
+    configure_file(
+      "config.hpp.in"
+      "${CMAKE_BINARY_DIR}/configured_files/include/config.hpp"
+      ESCAPE_QUOTES
+    )
+    ```
 
-## target_compile_definitions
+  - ```cpp    
+    #pragma once
+    // config.hpp.in  输入文件
 
-- 将cmake中定义的变量 传递到源文件中
-- `target_compile_definitions(MathFunctions PRIVATE "USE_MYMATH")`
-  - 将 `USE_MYMATH` 作为预定义的符号传入
-  - 可用于控制源文件中使用不同的实现方式
+    #include <cstdint>
+    #include <string_view>
 
+    static constexpr std::string_view project_name = "@PROJECT_NAME@";
+    static constexpr std::string_view project_version = "@PROJECT_VERSION@";
 
+    static constexpr std::int32_t project_version_major{@PROJECT_VERSION_MAJOR@};
+    static constexpr std::int32_t project_version_minor{@PROJECT_VERSION_MINOR@};
+    static constexpr std::int32_t project_version_patch{@PROJECT_VERSION_PATCH@};
+    ```
 
+- `cmake` 文件夹
+  - 用于存放`cmake`的模块文件
+  - 可以在`xxxxx.camke`文件中定义一些函数，在其他`CMakeLists.txt`文件中进行调用
+  
+
+### 引入三方库
+
+#### GitHub中的CMake项目
+- 项目文件中有`CMakeLists.txt` 文件
+- 可以使用FetchContent 方法，直接获取github代码进行生成
+- ```cmake
+  include(FetchContent)
+
+  FetchContent_Declare(
+      nlohmann_json
+      GIT_REPOSITORY https://github.com/nlohmann/json
+      GIT_TAG v3.11.2
+      GIT_SHALLOW TRUE
+  )
+  FetchContent_MakeAvailable(nlohmann_json)
+  ```
+- 自动从GitHub拉取代码，放在`build/_deps`目录下
+
+#### GitHub中的非CMake项目
+- 非CMake的项目，需要自己写 `add_libraries()` 生成库文件
+- 然后通过`target_link_libraries()`方法链接库文件
+
+#### 直接使用编译好的库
 - 
 
-## include_directories
+### 单元测试
 
-- `include_directories` 指定了包含目录，以便编译器能够找到 `mylib.h` 头文件
+### 项目文档
 
-
-
-## aux_source_directory
-
-- `aux_source_directory(<dir> <variable>)` 
-  - 将指定的 dir 中的源文件路径，保存在 variable 中
-  - variable 是一个列表
-- 
-
-
-
+### 三方库管理
 
 
 # 案例：编译自定义的库
@@ -194,22 +275,16 @@ b1244ee4e1e669f15e328a17338bdab1a5afc039
 
 ### 文件结构
 
-> :project_folder/
->
-> | -- CMakeLists.txt
->
-> | -- include/
->
-> |	| -- calculator.h
->
-> | -- src/
->
-> |	| -- calculator.cpp
->
-> | -- app/
->
-> |	| -- main.cpp
-
+```
+ :project_folder/
+ | -- CMakeLists.txt
+ | -- include/
+ |	| -- calculator.h
+ | -- src/
+ |	| -- calculator.cpp
+ | -- app/
+ |	| -- main.cpp
+```
 
 
 ### 编译生成静态库
@@ -300,6 +375,125 @@ add_executable(MyCalculatorApp app/main.cxx)
 target_link_libraries(MyCalculatorApp PRIVATE libcalculator_library.dll)
 ```
 
+
+# 案例：使用cmake+vcpkg进行cpp工程管理
+
+- 工作中常用到的库：
+  1. opencv
+  2. openvino
+  3. tensorRT
+  4. spdlog
+  5. httplib
+  6. Cache2  unit_test
+  7. fmt ??
+  8. json ??
+
+CMake + vcpkg 管理 C++ 代码的工作流程
+1. 环境准备
+安装 CMake：确保在你的系统上安装了 CMake。
+安装 vcpkg：
+从 GitHub 克隆 vcpkg：
+git clone https://github.com/microsoft/vcpkg.git
+编译 vcpkg：
+./bootstrap-vcpkg.sh  # Linux/Mac
+.\bootstrap-vcpkg.bat  # Windows
+1. 创建项目结构
+以下是推荐的项目目录结构：
+```
+MyProject/
+├── CMakeLists.txt
+├── include/
+│   └── myproject/
+│       └── my_header.h
+├── src/
+│   ├── main.cpp
+│   └── my_source.cpp
+├── tests/
+│   └── my_test.cpp
+└── vcpkg.json
+```
+
+3. 使用 vcpkg 添加依赖
+在项目根目录下，创建一个 vcpkg.json 文件：
+
+{
+    "dependencies": [
+        "boost",
+        "fmt"
+    ]
+}
+4. 编写 CMakeLists.txt
+在项目根目录下创建 CMakeLists.txt 文件：
+
+cmake_minimum_required(VERSION 3.10)
+project(MyProject)
+
+## 设置 vcpkg 路径
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+
+## 查找必要的模块
+set(CMAKE_CXX_STANDARD 17)
+
+## 创建可执行文件
+add_executable(MyExecutable src/main.cpp src/my_source.cpp)
+
+## 指定头文件搜索路径
+target_include_directories(MyExecutable
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+## 链接 vcpkg 库
+find_package(fmt CONFIG REQUIRED)  # 使用 fmt 库
+find_package(Boost REQUIRED)       # 使用 Boost 库
+
+target_link_libraries(MyExecutable
+    PRIVATE
+        fmt::fmt
+        Boost::Boost
+)
+5. 构建项目
+安装依赖：
+在项目目录下执行以下命令安装 vcpkg 依赖：
+
+./vcpkg install
+构建项目：
+使用 CMake 构建项目：
+
+mkdir build
+cd build
+cmake ..
+cmake --build .
+6. 测试与验证
+在 tests/ 目录中添加测试代码，通过 CMake 添加测试支持，可以使用 Google Test 或 Catch2 等测试框架。
+
+例子 (假设使用 Catch2)
+在 CMakeLists.txt 中添加测试支持：
+
+include(EnableCTest)
+enable_testing()
+
+## 假设使用 Catch2
+find_package(Catch2 REQUIRED)
+
+add_executable(MyTests tests/my_test.cpp)
+target_link_libraries(MyTests PRIVATE Catch2::Catch2)
+
+include(CTest)
+include(Catch)
+catch_discover_tests(MyTests)
+
+## 总结工作流程
+创建项目结构：定义清晰的文件夹布局。
+使用 vcpkg 管理依赖：通过 vcpkg.json 以及 vcpkg 命令安装库。
+编写 CMake 文件：使用 CMakeLists.txt 指定项目设置和依赖。
+构建和测试：使用 CMake 来构建项目，并包含测试框架。
+目录结构总结：
+include/：存放公共头文件。
+src/：存放源代码文件。
+tests/：存放测试文件。
+vcpkg.json：定义项目使用的第三方库。
+这种结构和工作流程确保你的项目模块化、可维护，并容易扩展。
 
 
 # 案例：使用第三方库

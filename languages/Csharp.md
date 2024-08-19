@@ -562,6 +562,66 @@
   }
   ```
 
+## WinForm
+
+### 最佳实践
+
+- 变量名: camelCase,  `firstNameLabel`
+- 创建控件后，首先给控件命名（便于后续事件名与控件名关联）；
+- 
+- 
+
+
+### 常用控件
+
+- `TabIndex`  使用 Tab 键跳转时的顺序；
+
+#### StatusStrip
+- 状态栏
+- 窗口最下缘，边框；
+- 用于提示信息
+
+#### MenuStrip
+- 菜单栏
+- 类似按钮，可以创建点击事件
+- 在`Text`属性中，插入`&`, 可以使用 `Alt+字母` 的方式快捷打开
+  - 在日常软件使用中，也可以使用该特性，按住`Alt`键，此时菜单栏上的字母会出现下划线，点击对应的字母即可打开相应的标签；
+
+
+### 常用布局
+
+
+### 线程
+
+- 耗时操作放在子线程中运行
+```c#
+Task.Run(()=>{
+  string html = webClient.DownloadString("https://www.hello.com");  // 阻塞；
+})
+```
+
+- 在子线程中执行完得到的结果，要回传给界面元素，需要创建委托
+```c#
+this.Invoke(new Action(()=>{
+  textBox1.Text = html;
+}));
+```
+
+- 也可以通过异步方法实现 （`async`   `await`）
+```c#
+# await 直接拿到 Task<T> 类型参数
+string html = await myDownloadAsync(url);
+textBox1.Text = html;
+
+private Task<string> myDownloadAsync(string url){
+  WebClient webClient = new WebClient();
+  return Task.Run(()=>{
+    return webClient.DownloadString(url);
+  });
+}
+```
+
+
   
 
 

@@ -233,6 +233,19 @@ Metric|描述评价指标
   |80|1|8|0.00005|0.929|
 
 
+  ### 案例：时序-电力预测
+
+  #### 模型选项与数据准备
+
+  #### 模型训练
+
+  #### 模型评估与调优
+
+  #### 模型部署与服务调用
+
+  #### 多模型融合时序预测
+
+
 ## 部署（FastDeploy）
 - FastDeploy API: `https://baidu-paddle.github.io/fastdeploy-api/`
 
