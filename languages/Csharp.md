@@ -54,8 +54,118 @@ Console.WriteLine("size of char value: {0}", sizeof(char));  // 2
 Console.WriteLine("size of bool value: {0}", sizeof(bool));  // 1
 ```
 
-- 引用类型：
+## 高级特性
+
+### 委托 delegate
+
+- 委托： 函数指针，是对函数原型的包装，给函数原型起了一个名字
+- 委托声明： `public delegate double MyDelegate(double x);`
+- 委托实例化：`MyDelegate d2 = new MyDelegate(obj.myMethod);`
+- 委托调用： `委托变量名（参数列表）  d2(8.9);`
+- 目的：使得可以像一个变量一样的去传递各种函数（例如将一种类型的函数传递给另一个函数做计算）；
+- C#中已经定义好的委托：
+  - `Action<T1, T2>`  代表 无返回值，任意参数个数的函数原型；
+  - `Func<T1, T2, Tresult>`  代表 有返回值，任意参数个数的函数原型
+- **委托的合并**：
+  - 一个委托实例中可以 **包含多个函数**  多播；
+  - 调用委托时，就是调用了其中多个函数
+  - 通过 `+  -  +=  -=` 可以动态的增减其中的函数，提高程序灵活性
+
+### 事件 
+
+- 事件  相当于 回调函数
+- 事件的声明：`public event 委托名 事件名`
+- 事件的注册和移除：`事件名 += 或 -=`
+- 事件的触发：`事件名（参数列表） `
+
+
+### Lambda 表达式
+
+- 形式：`(参数)=>{}`
+  - `button1.Click += (sender, e)=>{...}`
+  - `new Thread(()=>{...}).Start()`
   - 
+
+## IO
+
+- File
+- FileInfo
+- Directory
+
+### 文本文件操作
+```C#
+{
+    // StreamReader(filePath, fileEncode);
+    var sr = new StreamReader(@"D:\test.txt", System.Text.Encoding.UTF8);
+    Console.WriteLine(sr.Read());  // 读取一个字符
+    Console.WriteLine(sr.ReadLine());  // 读取一行
+    Console.WriteLine(sr.ReadToEnd());  // 读取到末尾
+    sr.Close();
+}
+
+{
+    // StreamWriter(filePath, isAppend, fileEncode);
+    var sw = new StreamWriter(@"D:\test.txt", true, System.Text.Encoding.ASCII);
+    sw.Write('H');  // 写一个字符
+    sw.WriteLine("ello World");  // 写一行
+    sw.WriteLine("你好，范闲");
+    sw.Flush();  // 刷新缓存 实际写入文件中
+    sw.Close();
+}
+```
+
+### 序列化
+
+- 直接把一个对象序列化为一个二进制文件进行存储
+```c#
+TestSerialize.Test.main();
+
+
+
+
+[Serializable]
+class Book
+{
+    public string name;
+    public int num = 13;
+    public string[] reader;
+
+    public string ToString()
+    {
+        return name + ":" + string.Join(",", reader) + ":" + num;
+    }
+}
+
+
+
+namespace TestSerialize
+{
+    class Test
+    {
+        static public void main()
+        {            
+            BinaryFormatter formatter = new BinaryFormatter();
+
+            Book book = new Book();
+            book.name = "C#";
+            book.num = 20;
+            book.reader = new string[] { "xiaoli", "xiaowang", "xiaozhang" };
+
+            // 序列化
+            FileStream stream = new FileStream("D://testSerielObj.t", FileMode.Create, FileAccess.Write, FileShare.None);
+            formatter.Serialize(stream, book);
+            stream.Close();
+
+            // 反序列化
+            FileStream read_stream = new FileStream("D://testSerielObj.t", FileMode.Open, FileAccess.Read, FileShare.Read);
+            Book b = (Book)formatter.Deserialize(read_stream);
+            Console.WriteLine(b.name + " : " + b.num);
+            read_stream.Close();
+        }
+    }
+}
+```
+
 
 # 编译
 
@@ -185,6 +295,12 @@ Console.WriteLine("size of bool value: {0}", sizeof(bool));  // 1
 ## 结构体
 
 - 结构体：值类型，不需要在堆上进行实例化；
+  - 结构体不能包含无参数构造方法
+  - 每个字段在定义时，不能给初始值
+  - 构造方法中，必须对每个字段进行赋值
+  - Struct 是 Sealed的， **不能被继承**；
+  - 实例化时，也使用`new`,但与引用类型变量的内存不同；
+  - `struct`变量在赋值时，实行的是字段的`copy`
 - 结构体隐式包含一个**无法重写的无参数构造器**，将字段按位置为0；
 - 定义结构体的构造器时，必须显示的为每一个字段赋值；
 - **不能在结构体字段声明时赋初始值**！
@@ -638,6 +754,13 @@ Console.WriteLine("size of bool value: {0}", sizeof(bool));  // 1
 
 ### 常用布局
 
+- 绝对布局：
+  - Location  以像素为单位，设置控件的X Y 坐标
+  - Size  以像素为单位，设置控件的宽高
+- 相对布局：
+  - Anchor  把控件附着在窗体的一个或多个边框上
+  - Dock   把控件和窗体的一个或多个边框连接起来，放置并填充（占据的位置）
+
 ### 线程
 
 - 耗时操作放在子线程中运行
@@ -670,3 +793,19 @@ private Task<string> myDownloadAsync(string url){
   });
 }
 ```
+
+## 算法
+
+### 台阶问题
+
+> 假设：一次只能上一个台阶或者上两个台阶，问上9个台阶总共有几种上法？
+- 上1个台阶只有一种上法；
+- 上2个台阶有两中上法；
+- 逆向思考，上到第9个台阶前，只有可能从第7个台阶或者第8个台阶上，所以`f(9)=f(7)+f(8)`
+- 是**斐波那契数列**
+
+> 韩信点兵：若将士兵3个人一排还剩2个人，若5个人一排还剩3个人，若7个人一排还剩5个人
+- “3个人一排还剩2个人” 翻译成数学表达式是 `x%3=2`
+- “5个人一排还剩3个人” 翻译成数学表达式是 `x%5=3`
+- “7个人一排还剩5个人” 翻译成数学表达式是 `x%7=5`
+- 用编试的算法，依次测试直到找到满足这三个表达式的数字
