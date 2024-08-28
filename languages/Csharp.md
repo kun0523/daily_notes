@@ -208,6 +208,118 @@ namespace TestSerialize
 }
 ```
 
+## 高级特性
+
+### 委托 delegate
+
+- 委托： 函数指针，是对函数原型的包装，给函数原型起了一个名字
+- 委托声明： `public delegate double MyDelegate(double x);`
+- 委托实例化：`MyDelegate d2 = new MyDelegate(obj.myMethod);`
+- 委托调用： `委托变量名（参数列表）  d2(8.9);`
+- 目的：使得可以像一个变量一样的去传递各种函数（例如将一种类型的函数传递给另一个函数做计算）；
+- C#中已经定义好的委托：
+  - `Action<T1, T2>`  代表 无返回值，任意参数个数的函数原型；
+  - `Func<T1, T2, Tresult>`  代表 有返回值，任意参数个数的函数原型
+- **委托的合并**：
+  - 一个委托实例中可以 **包含多个函数**  多播；
+  - 调用委托时，就是调用了其中多个函数
+  - 通过 `+  -  +=  -=` 可以动态的增减其中的函数，提高程序灵活性
+
+### 事件 
+
+- 事件  相当于 回调函数
+- 事件的声明：`public event 委托名 事件名`
+- 事件的注册和移除：`事件名 += 或 -=`
+- 事件的触发：`事件名（参数列表） `
+
+
+### Lambda 表达式
+
+- 形式：`(参数)=>{}`
+  - `button1.Click += (sender, e)=>{...}`
+  - `new Thread(()=>{...}).Start()`
+  - 
+
+## IO
+
+- File
+- FileInfo
+- Directory
+
+### 文本文件操作
+```C#
+{
+    // StreamReader(filePath, fileEncode);
+    var sr = new StreamReader(@"D:\test.txt", System.Text.Encoding.UTF8);
+    Console.WriteLine(sr.Read());  // 读取一个字符
+    Console.WriteLine(sr.ReadLine());  // 读取一行
+    Console.WriteLine(sr.ReadToEnd());  // 读取到末尾
+    sr.Close();
+}
+
+{
+    // StreamWriter(filePath, isAppend, fileEncode);
+    var sw = new StreamWriter(@"D:\test.txt", true, System.Text.Encoding.ASCII);
+    sw.Write('H');  // 写一个字符
+    sw.WriteLine("ello World");  // 写一行
+    sw.WriteLine("你好，范闲");
+    sw.Flush();  // 刷新缓存 实际写入文件中
+    sw.Close();
+}
+```
+
+### 序列化
+
+- 直接把一个对象序列化为一个二进制文件进行存储
+```c#
+TestSerialize.Test.main();
+
+
+
+
+[Serializable]
+class Book
+{
+    public string name;
+    public int num = 13;
+    public string[] reader;
+
+    public string ToString()
+    {
+        return name + ":" + string.Join(",", reader) + ":" + num;
+    }
+}
+
+
+
+namespace TestSerialize
+{
+    class Test
+    {
+        static public void main()
+        {            
+            BinaryFormatter formatter = new BinaryFormatter();
+
+            Book book = new Book();
+            book.name = "C#";
+            book.num = 20;
+            book.reader = new string[] { "xiaoli", "xiaowang", "xiaozhang" };
+
+            // 序列化
+            FileStream stream = new FileStream("D://testSerielObj.t", FileMode.Create, FileAccess.Write, FileShare.None);
+            formatter.Serialize(stream, book);
+            stream.Close();
+
+            // 反序列化
+            FileStream read_stream = new FileStream("D://testSerielObj.t", FileMode.Open, FileAccess.Read, FileShare.Read);
+            Book b = (Book)formatter.Deserialize(read_stream);
+            Console.WriteLine(b.name + " : " + b.num);
+            read_stream.Close();
+        }
+    }
+}
+```
+
 
 # 编译
 
