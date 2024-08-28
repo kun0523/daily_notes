@@ -1,5 +1,5 @@
 # C#
-- aliyun-bei-3.1.1
+- aliyun-bei-3.3.1
 ## 基础
 
 ### CLR
@@ -36,10 +36,15 @@
 ![csharp data structure](../image_resources/csharp_data_structure.png)
 
 - 值类型：
+  - value type
+    - 简单类型（Simple）
+    - 结构类型（Struct）
+    - 枚举类型（Enum）
   - `float`  4个字节， `3.14f`
   - `double`  8个字节， `3.14   1.5e-3`
   - `decimal`  16个字节 `120.50m`  注意数字后面加 `m`
   - `char`  C# 中的字符使用 `Unicode` 表示，占两个字符 `\u0061`
+  - `DateTime`
 
 ```C#
 Console.WriteLine("size of int value: {0}", sizeof(int));  // 4
@@ -55,9 +60,44 @@ Console.WriteLine("size of bool value: {0}", sizeof(bool));  // 1
 ```
 
 - 引用类型：
-  - 
+  - reference type
+    - 类类型（Class）
+    - 接口类型（Interface）
+    - 委托类型（Delegate）
+    - 数组类型（Array）
 
-# 编译
+- 其他类型：
+  - 推断类型 `var`
+    - 其类型由编译器推断，在编译时确定具体类型
+  - Nullable 类型
+    - `int? a=32;`
+    - `if(a.HasValue) ...`
+  - Dynamic 类型
+    - `dynamic x = new Cell();`
+    - 编译时不检查，运行时才确定，主要用于与COM组件或其他语言交互
+
+- 托管类型 / 非托管类型
+  - 托管类型
+  - 非托管类型
+
+##### 数组
+
+- 声明
+  - **一维数组**： `int[] a;`  注意方括号在变量名前；
+  - C#语言中**声明数组时不能指定其长度**
+    - `int[] a = new int[3];`   在new表达式中指定长度
+    - `int[] a = {3, 9, 8}`  静态初始化
+    - `int[] a = new int[3]{3, 9, 8}`
+  - 数组是引用类型，它的元素相当于类的成员变量，因此数组一经分配空间，其中的每个元素会被**按照成员变量的方式被隐式初始化**（**数值类型为0，引用类型为null**）
+  - **二维数组**： `int[,] a = {{1,2,3}, {4,5,6}}`  注意变量声明时，方括号中有逗号
+    - `a.GetLength(0);`  获取第0维的长度
+  - **交错数组**  `int[][] t = new int[3][];`  数组的数组，与二维数组不同
+    - ![交错数组](../image_resources/csharp_cross_array.png)
+
+- 运算符优先级：
+  - 单目运算 > 算术运算 > 关系运算 > 逻辑运算 > 三目运算 > 赋值运算
+
+## 编译
 
 - 编译器  csc.exe
   - `csc.exe file1.cs` 直接使用编译器对指定文件进行编译；
@@ -70,7 +110,7 @@ Console.WriteLine("size of bool value: {0}", sizeof(bool));  // 1
   - 可以是一个 exe （包含一个Main方法） 也可以是一个 dll（没有入口点）
   - 不仅包含 IL，还包含元数据 metadata （元数据的引入使程序集无须额外的文件就可以引用其他程序集中的类型）
 
-# .NET
+## .NET
 
 - 包含：language  runtime  libraries
 - C# 编译器并不直接提供二进制可执行文件，而是提供 MSIL（Microsoft Intermediate Language）不能直接被机器使用
@@ -614,10 +654,15 @@ Console.WriteLine("size of bool value: {0}", sizeof(bool));  // 1
 
 ## WinForm
 
+- `F7` 从设计跳转到代码 cs
+- `Shift+F7`  从代码跳转到设计
+
 ### 最佳实践
 
 - 变量名: camelCase,  `firstNameLabel`
 - 创建控件后，首先给控件命名（便于后续事件名与控件名关联）；
+- `this.Close();`  关闭当前窗口
+- `Application.Exit();`  关闭整个应用
 
 ### 常用控件
 

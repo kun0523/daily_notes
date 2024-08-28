@@ -304,6 +304,7 @@ target_include_directories(calculator_library PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 # 示例可执行文件的构建
 add_executable(MyCalculatorApp app/main.cxx)
 target_link_libraries(MyCalculatorApp PRIVATE calculator_library)
+
 ```
 
 
