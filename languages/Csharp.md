@@ -1,5 +1,11 @@
 # C#
-- aliyun-bei-3.3.1
+
+## 快捷键
+
+- `ctrl+}`: **成对大括号**之间来回跳转；
+- `F7`: 从设计跳转到代码； `shift+F7`: 代码跳转到设计界面；
+- 
+
 ## 基础
 
 ### CLR
@@ -896,7 +902,64 @@ namespace TestSerialize
 
 ### 常用控件
 
-- `TabIndex`  使用 Tab 键跳转时的顺序；
+- 控件三要素：
+  - 属性
+  - 事件
+  - 方法
+
+
+- `TabIndex`  使用 Tab 键跳转时的
+顺序；
+- `CheckedListBox` 可以动态新增多选框；
+- 容器控件：用于界面布局
+- 时钟控件：
+  - 单位：ms；
+  - 作用：每隔指定的时间去执行指定的任务；
+  - 配置：1.Enabled；2.时间间隔；3.事件；
+  - 启动时钟：`timer.Start();  timer.Enabled=True;` 都可以
+- `ComboBox`  点选控件
+  - DropDownStyle 可以选择风格：可输入的下拉选（DropDown）/ 下拉选（DropDownList）/点选（Simple）
+  - `combo.Items.Add(string...)`
+  - `combo.Items.Remove(combo.Text)`
+
+- `ListView`  可以用于实现绘制表格的效果
+  - `Items.Add`  新增项目
+  - `LargeIcon`  选择视图， 载入大图标
+  
+- `OpenFileDialog`  选取文件的对话框
+  ```c#
+  // 配置起始位置
+  openFileDialog1.InitialDirectory = Application.StartupPath;
+  // 配置文件筛选规则
+  openFileDialog1.Filter = "图片文件(*.jpg)|*.jpg";
+  // 判断对话框是否被成功开启
+  if (openFileDialog1.ShowDialog() == DialogResult.OK)
+  {
+      // 先选取的文件夹路径，赋值给其他变量
+      textBox1.Text = openFileDialog1.FileName;
+  }
+  ```
+
+- `MenuStrip`  菜单栏
+- `ContextMenuStrip`  右键菜单
+  - 创建完之后，需要关联到具体的控件上；
+  - 在目标控件的`ContextMenuStrip` 属性上选择相应的右键菜单控件；
+- `StatusStrip`  状态栏
+
+- `backgroundworker`  后台线程控件  开启子线程
+  - `DoWork`  事件，将耗时操作放在这里进行
+  - `backgroundworker1.RunWorkerAsync();`  开启后台线程
+  - `backgroundworker1.IsBusy;`  判断该线程是否已经被开启，一个线程只能被开启一次
+  - `Invoke();`  使用该方法，从子线程中，自动去查找主线程中的控件，并修改其值
+```c#
+Invoke(new Action(()=>{
+  label2.Text = num.ToString();
+}));
+```
+
+- 给控件指定父窗体：`label2.Parent = label1;` 
+  - 如果将`label2`的背景色设置为 `Transparent` 则背景与其父窗体一致
+
 
 #### StatusStrip
 
@@ -917,8 +980,12 @@ namespace TestSerialize
   - Location  以像素为单位，设置控件的X Y 坐标
   - Size  以像素为单位，设置控件的宽高
 - 相对布局：
-  - Anchor  把控件附着在窗体的一个或多个边框上
-  - Dock   把控件和窗体的一个或多个边框连接起来，放置并填充（占据的位置）
+  - `Anchor`  把控件附着在窗体的一个或多个边框上，**让控件与绑定的边缘距离不变**；
+  - `Dock`   把控件和窗体的一个或多个边框连接起来，放置并填充（占据的位置）
+  - `TabelLayoutPanel` 
+  - `SplitContainer`  分割容器，可以将界面分割成两块，并可以调整分割比例
+  - `FlowLayoutPanel`  流布局  
+  - `TabControl`  
 
 ### 线程
 
@@ -950,6 +1017,29 @@ private Task<string> myDownloadAsync(string url){
   return Task.Run(()=>{
     return webClient.DownloadString(url);
   });
+}
+```
+
+### 案例
+
+#### 不同窗口之间跳转
+
+- 方法1：在新的线程中打开新的窗口，可用于同时开启多个窗口
+```C#
+// Thread t1 = new Thread(delegate () { new Form2().Show(); });  // 使用show就不行，关闭当前窗口的同时会全部关闭
+Thread t1 = new Thread(delegate () { new Form2().ShowDialog(); });  // 关闭第一个窗口的同时，维持第二个窗口
+t1.Start();
+this.Close();
+```
+
+- 方法2：在`Program`类中创建新窗口，仅用于关闭一个窗口才开启另一个窗口的场景；
+```c#
+Application.Run(new Form1());  // 程序会停留在这一行，直到该窗体被关闭
+//MessageBox.Show("Form1 has been closed.");
+
+if (isLoginSuccess)  // isLoginSuccess 是全局Static变量，在form1中赋值后，在此处判断是否成功
+{
+    Application.Run(new Form2());
 }
 ```
 
