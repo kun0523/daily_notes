@@ -960,6 +960,10 @@ Invoke(new Action(()=>{
 - 给控件指定父窗体：`label2.Parent = label1;` 
   - 如果将`label2`的背景色设置为 `Transparent` 则背景与其父窗体一致
 
+- `chart` 可以画各种图表
+  - `chart1.Series[0].Points.Add()`  新增点
+  - `chart1.Series[0].Points.Count == 10`  限制总共画几个点；
+
 
 #### StatusStrip
 
