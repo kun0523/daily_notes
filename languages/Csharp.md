@@ -889,7 +889,7 @@ namespace TestSerialize
   ```
 
 ## WinForm
-
+winfor
 - `F7` 从设计跳转到代码 cs
 - `Shift+F7`  从代码跳转到设计
 
@@ -961,8 +961,22 @@ Invoke(new Action(()=>{
   - 如果将`label2`的背景色设置为 `Transparent` 则背景与其父窗体一致
 
 - `chart` 可以画各种图表
+  - `chart1.Series[0].ChartType `  修改图像类型： 散点图 折线图 柱状图等
   - `chart1.Series[0].Points.Add()`  新增点
-  - `chart1.Series[0].Points.Count == 10`  限制总共画几个点；
+  - `chart1.Series[0].Points.Count == 10`  查看指定序列中有几个点
+  - `chart1.Series[0].Points.RemoveAt(0)`  移除前面第0个点
+```c#
+  // 需要加命名空间
+  // using System.Windows.Forms.DataVisualization.Charting;  
+  int rnum = rd.Next(0, 10);
+  DataPoint dp1 = new DataPoint();
+  //dp1.XValue = rnum;
+  dp1.YValues = new double[] { rnum };
+  dp1.Label = rnum.ToString();  // 给图上的数据加标签
+  chart1.Series[0].Points.Add(dp1);
+```
+
+- `toolStripContainer`  悬浮窗口
 
 
 #### StatusStrip
