@@ -1026,6 +1026,13 @@ private Task<string> myDownloadAsync(string url){
 
 ### 案例
 
+#### Http Server/Client
+
+##### Server
+
+##### Client
+
+
 #### 不同窗口之间跳转
 
 - 方法1：在新的线程中打开新的窗口，可用于同时开启多个窗口

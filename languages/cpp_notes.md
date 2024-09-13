@@ -3,7 +3,113 @@
   - `constexpr`  编译时常量，即编译完成后就变成常量；
 - windows 下 输入流 终止符： `ctrl+z`
 
-# 类：
+# 基础
+
+- 在任何地方都使用**大括号初始化**方法，大括号初始化方法几乎在任何地方都能正常工作，而且它引起的意外也最少；所以被称为“**统一初始化**”
+  
+
+## for循环
+
+```cpp
+
+// 只能访问，不能修改原序列的值
+for(auto i : arr){
+    i += 10;
+    printf("%d ", i);
+}
+
+// 可访问，可修改
+for(auto& i : arr){
+    i += 10;
+    printf("%d ", i);
+}
+```
+
+
+```cpp
+// 指定格式符
+char greet[] = "hello there";
+printf("%s\n", greet);
+```
+
+- 字符串字面量
+```cpp
+// 最后一个字符为0，表示字符串结尾；
+char alphabeta[27] = {0};   // 如果不给0，会有一串 “烫烫烫烫”
+for(int i=0; i<26; ++i){
+    alphabeta[i] = 65+i;  // 大写英文字母
+}
+printf("%s\n", alphabeta);
+printf("%d\n", std::size(alphabeta));
+
+for(int i=0; i<26; ++i){
+    alphabeta[i] = 97+i;  // 小写英文字母
+}
+printf("%s\n", alphabeta);
+```
+
+# 自定义类型
+
+## 枚举
+
+```cpp
+enum class Week{
+  Mon, Tue, Wed, Thu, Fri, Sat, Sun
+};
+
+Week day = Week::Mon;
+```
+
+## 结构体
+
+```cpp
+struct Book{
+    char name[256];
+    int year;
+    int pages;
+    bool hardcover;
+};
+
+Book b1;
+b1.pages = 170;
+```
+
+
+## 类：
+
+- 如果**没有定义构造函数**，可以之间使用 大括号对实例对象进行初始化；
+- 如果定义了构造函数，则必然会调用相应的构造函数进行初始化；
+- **没有任何大括号或小括号时**，**无参构造函数**被调用；
+- 类使用小括号，调无参构造函数，容易被编译器理解为函数声明；
+
+```cpp
+class Paper{
+public:
+    char name[200];
+    int year;
+    int pages;
+
+    Paper(){
+        memcpy(name, "TestPaper01", 20);        
+        year = 2024;
+        pages = 20;
+    }
+
+    Paper(char* name_, int year_, int pages_){
+        memcpy(name, name_, 20);        
+        year = year_;
+        pages = pages_;
+
+    }
+};
+
+Paper p1{"TestPaper", 2024, 5};
+printf("Paper Name: %s, Year: %d, Pages: %d\n", p1.name, p1.year, p1.pages);
+
+Paper p2{};
+printf("Paper Name: %s, Year: %d, Pages: %d\n", p2.name, p2.year, p2.pages);
+
+```
 
 - 一个类的构造函数中，**涉及在堆内存中创建变量**，则需要重载**复制构造函数(CopyConstructor)**和**赋值运算符（=）**和**析构函数（~T）**回收资源
 - 将类的构造函数声明为 `explicit` 可以防止进行隐式类型转换；为了避免没有预想到Bug，通常要避免自定义类型的隐式类型转换；
