@@ -6,7 +6,103 @@
 # 基础
 
 - 在任何地方都使用**大括号初始化**方法，大括号初始化方法几乎在任何地方都能正常工作，而且它引起的意外也最少；所以被称为“**统一初始化**”
+
+
+## 变量
+
+- **自动存储期**：对象在声明时在内存中开辟空间，在代码块结束时对象自动销毁，不需要程序员管理资源回收（局部变量就是自动变量）
+- **静态存储期**：
+  - 静态对象使用 `static` 或 `extern` 关键字来声明
+  - `extern` 修饰：在一个cpp文件（编译单元）中声明并定义`extern int MyAge=100;`  在另一个cpp文件（另一个编译单元）中可以访问该变量`extern int MyAge;`
+  - 全局静态变量：
+    - 在**声明函数的同一范围内**声明静态变量（这一范围即**全局作用域/命名空间作用域**）
+    - 全局作用域的静态对象具有静态存储期，**在程序启动时分配，在程序停止时释放**
+  - 局部静态变量：
+    - **仅局部有效**，不能从函数外部调用，局部静态变量是**在函数作用域内声明的**，就像自动变量一样；
+    - 但生命周期是**从包含它的函数第一次调用开始，直到程序退出时结束**；
+    - ```cpp
+      int print_number(int num) {
+        static size_t counter{0};
+        ++counter;
+
+        printf("I got a number: %d", num);
+        return counter;
+      }
+      ```
+
+  - 静态成员：
+    - 类的成员，与类的任何实例都不关联；
+    - 静态成员**本质上类似全局作用域中声明的静态变量和函数**，但必须**使用类名+作用域解析运算符`::`来引用**它们
+    -** 必须在全局作用域初始化静态成员，不能在类定义中初始化静态成员**；
+    - 静态成员只有一个实例，该类的所有实例都共享同一个静态成员；
+    - ```cpp
+      struct Food {
+        char name[256];
+        double price;
+        //static int purchase_num{ 0 };  // 静态成员 声明时不能初始化
+        static int purchase_num;
+      };
+
+      int Food::purchase_num{0};  // 静态成员必须在全局作用域初始化
+      ```
+
+- 线程局部存储期
+  - 通过为每个线程提供单独的变量副本，来避免多个线程同时对同一个全局变量进行修改；
+  - `thread_local` 关键字来修饰
+  - 怎么做最后统一的？？
+
+- 动态存储期
+  - 手动控制动态对象生命周期何时开始何时结束；
+  - 使用`new`表达式，创建给定类型的对象，返回指向新对象的指针；
+  - 使用`delete`表达式释放动态对象，`delete`表达式由delete关键字和指向动态对象的指针组成，delete表达式总是返回void;
+  - `delete[] my_array;`  使用 delete 释放动态数组
   
+几种存储类型的事例代码：
+```cpp
+struct Tracer {
+	Tracer(const char* name_) :name{ name_ } {
+		printf("%s Constructed.\n", name);
+	}
+
+	~Tracer() {
+		printf("%s Destructed.\n", name);
+	}
+
+private:
+	const char* const name;  // why??  没有两个const就会报错。。。
+};
+
+
+static Tracer t1{"Static Tracer"};  // 静态存储期
+static thread_local Tracer t2{"Thread-local Tracer"};  // 线程局部存储期
+
+void main() {
+	printf("Start Main Func\n");
+
+	Tracer t3{ "Automatic Tracer" };  // 自动存储期
+	printf("t3\n");
+
+	const auto* t4 = new Tracer{ "Dynamic Tracer" };  // 动态存储期
+	printf("t4\n");
+
+	delete t4;  // 没有delete表达式，就不会调用析构函数，造成内存泄漏
+}
+```
+输出结果：
+```bash
+Static Tracer Constructed.
+Thread-local Tracer Constructed.
+Start Main Func
+Automatic Tracer Constructed.
+t3
+Dynamic Tracer Constructed.
+t4
+Dynamic Tracer Destructed.
+Automatic Tracer Destructed.
+Thread-local Tracer Destructed.
+Static Tracer Destructed.
+```
+
 
 ## for循环
 
