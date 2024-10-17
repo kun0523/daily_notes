@@ -1068,6 +1068,40 @@ if (isLoginSuccess)  // isLoginSuccess 是全局Static变量，在form1中赋值
 }
 ```
 
+## C# on Ubuntu
+- C# 101 - ep10
+```bash
+sudo apt-get update 
+sudo apt-get install -y dotnet-sdk-8.0
+// 安装sdk之后就不需要再安装 runtime
+```
+
+- 建议安装的插件
+  - `C# Dev Kit` - Microsoft  需要登陆微软账户
+  - `C# Extensions` - JosKreativ
+  - `vscode-solution-explorer` - Fernando
+  - `Jupyter` - Microsoft
+  - `Polyglot Notebooks` - Microsoft  是C# 可以在jupyternotebook 里运行
+
+- ubuntu下的使用
+- 使用命令行创建项目
+```bash
+dotnet new console  // 在当前路径下创建一个Console应用
+dotnet run  // 编译并运行当前目录下的项目
+dotnet build  // 仅编译当前目录下的项目
+```
+
+- 使用工具创建项目
+  - `ctrl+shift+p`
+  - `>.NET: New Project`  选择创建的类型  设定名字
+
+- Debug
+  - `>.NET: Generate Assets for Build and Debug`
+  - 选择要Debug的项目
+  - F5 Debug
+  - 如果要调试新的项目，就需要在 `>.NET: Generate ...` 中选择相应的项目
+
+
 ## 算法
 
 ### 台阶问题
