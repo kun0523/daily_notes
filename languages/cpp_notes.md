@@ -129,6 +129,35 @@ Static Tracer Destructed.
   - `std::move()` 将变量从左值转变为右值，`#include<utility>`
 
 
+## 类型转换
+
+### `stoi`
+
+### `const_cast`
+- `const_cast` 函数可以去掉const修饰符，允许修改const值
+```cpp
+
+void change_const_value(const int& value){
+  // value++; 编译报错
+  auto& val = const_cast<int&>(value);
+  val++;
+}
+
+int tmp = 20;
+printf("original value: %d\n", tmp);
+change_const_value(tmp);
+printf("after change value: %d\n", tmp);
+
+// 输出
+// original value: 20
+// after change value: 21
+```
+
+### `static_cast`
+
+### `reinterpret_cast`
+
+### `narrow_cast`
 
 ## for循环
 
@@ -183,7 +212,9 @@ printf("%s\n", alphabeta);
     - 属性注入：声明一个指针成员，通过set方法，随时修改该成员的指向；
     - 
 ### 运行时多态
-- 通过对象组合的设计模式，将一个接口类作为类的成员，通过指定接口不同的派生类，在运行时实现多态效果；
+- 通过对象组合的设计模式，将一个接口类作为类的成员，通过构造函数注入或属性注入等方式，将成员指定为同一接口不同的派生类，在运行时实现多态效果；
+- `Logger& logger;`  定义引用， 不能重定位，所以只能使用一种logger，在构造函数中使用初始化列表进行初始化；
+- `Logger* logger;`  定义指针，可以通过属性注入的方式，灵活修改logger，通过`set`方法随时修改属性
 
 ### 编译时多态
 - 通过模板实现编译时多态
