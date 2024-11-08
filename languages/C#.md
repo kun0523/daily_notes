@@ -769,6 +769,23 @@ namespace TestSerialize
 
 # 多线程
 
+- 一个进程中会运行多个线程，它们共享同一个执行环境（内存）
+- 在一个线程的入口，都应该加异常处理，将异常情况写入Log
+
+```Csharp
+
+Thread t = new Thread(()=>{Func(5);});
+t.Start()
+
+// Task 使用线程池 可以取得返回值
+Task<int> t = new Task.Run(()=>Func(5));
+int result = t.Result;
+
+// 在线程中 修改界面上的元素值
+Action update_labNgNumAction = ()=>{labNgNum.Text = ngNum.ToString();};
+Invoke(update_labNgNumAction);
+```
+
 
 
 # 调用CPP DLL

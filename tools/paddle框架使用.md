@@ -10,8 +10,191 @@
 - `pip install paddlepaddle-gpu==2.6.1 -i https://pypi.tuna.tsinghua.edu.cn/simple`
 - `pip install paddleclas`
 
+### 使用批处理完成整个流程
+```yaml
+# global configs
+Global:
+  checkpoints: null
+  pretrained_model: null
+  output_dir: ./PPHGNetV2_B6_3/
+  device: gpu
+  save_interval: 10
+  eval_during_train: True
+  eval_interval: 1
+  epochs: 400
+  print_batch_step: 1
+  use_visualdl: True
+  # used for static mode and model export
+  image_shape: [3, 224, 224]
+  save_inference_dir: ./inference
+
+# mixed precision
+AMP:
+  use_amp: True
+  use_fp16_test: False
+  scale_loss: 128.0
+  use_dynamic_loss_scaling: True
+  use_promote: False
+  # O1: mixed fp16, O2: pure fp16
+  level: O1
+
+# model architecture 
+Arch:
+  name: PPHGNetV2_B6  # 自己想使用的模型名称
+  class_num: 2  # 自己数据集的类别个数
+  pretrained: True  # 框架自动下载模型到 C:\Users\Administrator\.paddleclas\weights
+ 
+# loss function config for traing/eval process
+Loss:
+  Train:
+    - CELoss:
+        weight: 1.0
+  Eval:
+    - CELoss:
+        weight: 1.0
+
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: Cosine
+    learning_rate: 0.06
+    warmup_epoch: 5
+  regularizer:
+    name: 'L2'
+    coeff: 0.0001
+
+# data loader for train and eval
+DataLoader:
+  Train:
+    dataset:
+      name: ImageNetDataset  # 需要标注文件  `image_pth  0/1`
+      image_root: E:\DataSets\edge_crack\classify_ppcls_1106 
+      cls_label_path: E:\DataSets\edge_crack\classify_ppcls_1106/train_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - RandCropImage:
+            size: 224
+        - RandFlipImage:
+            flip_code: 1
+        - RandAugment:
+            num_layers: 2
+            magnitude: 5
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+        - RandomErasing:
+            EPSILON: 0.25
+            sl: 0.02
+            sh: 1.0/3.0
+            r1: 0.3
+            attempt: 10
+            use_log_aspect: True
+            mode: pixel
+
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: True
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+  Eval:
+    dataset: 
+      name: ImageNetDataset
+      image_root: E:\DataSets\edge_crack\classify_ppcls_1106 
+      cls_label_path: E:\DataSets\edge_crack\classify_ppcls_1106/val_list.txt
+      transform_ops:
+        - DecodeImage:
+            to_rgb: True
+            channel_first: False
+        - ResizeImage:
+            resize_short: 256
+        - CropImage:
+            size: 224
+        - NormalizeImage:
+            scale: 1.0/255.0
+            mean: [0.485, 0.456, 0.406]
+            std: [0.229, 0.224, 0.225]
+            order: ''
+    sampler:
+      name: DistributedBatchSampler
+      batch_size: 64
+      drop_last: False
+      shuffle: False
+    loader:
+      num_workers: 4
+      use_shared_memory: True
+
+
+Infer:
+  infer_imgs: docs/images/inference_deployment/whl_demo.jpg
+  batch_size: 10
+  transforms:
+    - DecodeImage:
+        to_rgb: True
+        channel_first: False
+    - ResizeImage:
+        resize_short: 256
+    - CropImage:
+        size: 224
+    - NormalizeImage:
+        scale: 1.0/255.0
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
+        order: ''
+    - ToCHWImage:
+  PostProcess:
+    name: Topk
+    topk: 1
+    class_id_map_file: E:\DataSets\edge_crack\classify_ppcls_1106\label.txt
+
+
+Metric:
+  Train:
+    - TopkAcc:
+        topk: [1, 5]
+  Eval:
+    - TopkAcc:
+        topk: [1, 5]
+```
+
+```bash
+# 训练  注意修改配置文件中的 *保存路径*  *模型名称*  *类别个数*  *数据路径* 
+python E:/le_ppcls/PaddleClas/tools/train.py -c config.yaml
+
+# 验证
+python E:/le_ppcls/PaddleClas/tools/eval.py -c config.yaml -o Global.pretrained_model=E:/le_ppcls/crack_cls/PPHGNetV2_B6_3/best_model
+
+# 推理  可以推理单张图 也 可以遍历推理文件夹
+python E:/le_ppcls/PaddleClas/tools/infer.py -c config.yaml -o Global.device=cpu -o Global.pretrained_model=E:/le_ppcls/crack_cls/PPHGNetV2_B4/best_model -o Infer.infer_imgs=E:/DataSets/edge_crack/cut_patches_0905/crack/20240628100710_1108.jpg
+
+# 导出静态图
+python E:/le_ppcls/PaddleClas/tools/export_model.py -c config.yaml ^
+       -o Global.pretrained_model=E:/le_ppcls/crack_cls/PPHGNetV2_B4/best_model ^
+	     -o Global.save_inference_dir=E:/le_ppcls/crack_cls/PPHGNetV2_B4/inference
+
+# 修改输入尺寸  固定输入batch，兼容openvino推理模块
+python E:/le_ppcls/Paddle2ONNX/tools/paddle/infer_paddle_model_shape.py ^
+  --model_path E:/le_ppcls/crack_cls/PPHGNetV2_B6_3/inference/inference  ^
+	--input_shape_dict {'x':[1,3,224,224]} ^
+	--save_path E:/le_ppcls/crack_cls/PPHGNetV2_B6_3/inference/new_inference
+
+# 导出onnx
+paddle2onnx --model_dir E:/le_ppcls/crack_cls/PPHGNetV2_B6_3/inference ^
+            --model_filename new_inference.pdmodel ^
+	      		--params_filename new_inference.pdiparams ^
+			      --save_file inference.onnx --opset_version 13
+```
 
 ### 训练
+- 多种模型效果对比：`https://github.com/PaddlePaddle/PaddleClas/blob/release/2.6/docs/zh_CN/models/ImageNet1k/README.md`
 
 #### 数据集组织方式
 
@@ -54,6 +237,8 @@ Metric|描述评价指标
     - `python tools/train.py -c ./ppcls/configs/quick_start/new_user/ShuffleNetV2_x0_25.yaml -o Arch.pretrained=True`
   - 使用本地下载好的模型
     - `python E:\paddle\paddleclas\tools\train.py -c E:\my_paddle\train_workdir\ShuffleNetV2_x0_25.yaml -o Global.pretrained_model=E:\Pretrained_models\paddle_cls\ShuffleNetV2_x0_25_pretrained.pdparams`
+    - `python E:\paddle\paddleclas\tools\train.py -c E:\my_paddle\train_workdir\ShuffleNetV2_x0_25.yaml -o Global.pretrained_model=True`
+    - `-o Global.pretrained_model=True` 自动下载
   - 基于预训练模型，效果好非常多，只需要几个epoch，验证精度就已经96%+ ！！
 - 基于预训练模型冻结部分层后训练 
 - 训练过程可视化
@@ -70,9 +255,20 @@ Metric|描述评价指标
   - `inference.pdmodel`  存储网络结构信息
   - `inference.pdiparams`  存储网络权重信息
   - `inference.pdiparams.info`  存储模型的参数信息，在paddle分类模型和识别模型中可忽略 ？？
-- 导出 Paddle
+- 导出 Paddle  inference model
   - `python3 tools/export_model.py -c ./ppcls/configs/Products/ResNet50_vd_Aliproduct.yaml -o Global.pretrained_model=./product_pretrain/product_ResNet50_vd_Aliproduct_v1.0_pretrained -o Global.save_inference_dir=./deploy/models/product_ResNet50_vd_aliproduct_v1.0_infer`
-- 导出 onnx
+
+- 转换固定尺寸  **在使用openvino推理时必须确定输入shape**
+  - `python ../Paddle2ONNX/tools/paddle/infer_paddle_model_shape.py --model_path E:\le_ppcls\crack_cls\output\best\inference 
+--save_path E:\le_ppcls\crack_cls\output\best\new_inference 
+--input_shape_dict="{'x':[1,3,224,224]}" `
+
+- 导出onnx
+  - `paddle2onnx --model_dir E:\le_ppcls\crack_cls\output\best 
+            --model_filename new_inference.pdmodel 
+            --params_filename new_inference.pdiparams 
+            --save_file new_model.onnx 
+			--opset_version 13`
 
 #### 轻量化
 
@@ -155,6 +351,18 @@ Metric|描述评价指标
   
 ### 安装
 
+- 有两种安装模式：
+  - Wheel安装：适合于仅用paddlex做**模型推理**的场景
+  - 插件式安装：适合于使用paddlex做**二次开发、模型微调**的场景
+
+- 插件式安装：
+  - `https://github.com/PaddlePaddle/PaddleX/blob/release/3.0-beta1/docs/installation/installation.md`
+  - 先安装 paddlepaddle `python -m pip install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/`
+  - 再安装 paddlex 
+    - `git clone https://github.com/PaddlePaddle/PaddleX.git`
+    - `pip install -e .`
+  - 最后安装相应的插件 例如 PaddleClas `paddlex --install PaddleClas`
+
 - 使用docker环境
   - `docker run --gpus all --name ubuntu --privileged --network=host -p 2222:22 -v E:\paddle\paddlex:/home/paddlex -it <image_id> /bin/bash`
   - 使用的镜像版本：`paddle:3.0.0b1-gpu-cuda11.8-cudnn8.6-trt8.5`
@@ -189,9 +397,17 @@ Metric|描述评价指标
   1. 命令行追加 `-o` 参数，如：`-o Global.mode=train`；
   2. 编辑 `paddlex/configs/` 目录下对应的 yaml 配置文件，如 `paddlex/configs/image_classification/ResNet50.yaml`；
   3. 编辑 `paddlex/repo_apis/xxx_api/configs/` 目录下的 yaml 配置文件，如 `paddlex/repo_apis/PaddleClas_api/configs/ResNet50.yaml`；
+   
+- 使用预训练模型：
+  - 命令行追加：`-o Train.Pretrain_weight_path=./xxxx`
+  - 在上述目录下放一个 `xxx.pdparams` 的文件，框架会自己根据配置文件下载正确的预训练模型，（虽然很奇怪但是有效。。。）
+  - ![有无预训练模型对比](../image_resources/withorwithoutPretrainedModel.png)
+    - 绿色为使用了预训练模型，蓝色为没有使用预训练模型，其余参数都一致
+
 
 ### 模型评估
 - `python main.py -c paddlex/configs/object_detection/PP-YOLOE_plus-S.yaml -o Global.mode=evaluate -o Global.dataset_dir=./dataset/fall_det -o Global.device=gpu:0`
+  - `-o Global.weight_path`  如果不指定模型路径，则使用配置文件中的路径
 
 ### 模型推理
 - `python main.py -c paddlex/configs/object_detection/PP-YOLOE_plus-S.yaml  -o Global.mode=predict -o Predict.model_dir=output/best_model -o Predict.input_path=https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/fall.png`
