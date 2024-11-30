@@ -198,9 +198,10 @@ paddle2onnx --model_dir E:/le_ppcls/crack_cls/PPHGNetV2_B6_3/inference ^
 
 #### 数据集组织方式
 
-- `PaddleClas` 使用 `txt` 格式文件指定训练集和测试集
-- 通常 训练集 与 验证集 图像分别存放在两个文件夹中，`train_list.txt` 和 `val_list.txt` 存储标注信息
-- `train_list.txt`
+- 通常使用 `ImageNetDataset` 的方式组织数据
+  - 训练集、验证集、测试集图像存在一个目录下，使用 `txt` 格式文件指定训练集和测试集
+  - 通常 训练集 与 验证集 图像分别存放在两个文件夹中，`train_list.txt` 和 `val_list.txt` 存储标注信息
+  - `train_list.txt`
   ```
   # 每一行采用"空格"分隔图像路径与标注
   # 下面是 train_list.txt 中的格式样例
@@ -210,6 +211,7 @@ paddle2onnx --model_dir E:/le_ppcls/crack_cls/PPHGNetV2_B6_3/inference ^
   val/ILSVRC2012_val_00000001.JPEG 65
   ...
   ```
+  - `label.txt` 文件存各个类的名称，例如 `0 ng \n 1 ok`
 
 #### 配置文件
 
@@ -244,6 +246,104 @@ Metric|描述评价指标
 - 训练过程可视化
   - `visualdl --logdir ./output`
 - 训练过程Log定制
+
+#### 常用图像增强配置
+- 通常流程：DecodeImage >> ResizeImage >> NormalizeImage
+
+- 解码图片 DecodeImage
+
+- ResizeImage
+
+- 归一化  NormalizeImage
+
+##### 图像变换类
+- RandFlipImage
+
+- RandCropImage
+
+- RandomRotation
+
+- 以下几种增强方式对精度提升的效果：
+- ![Alt text](../image_resources/ImageAugmentCompare.png)
+
+- AutoAugment  **归一化前**
+  - 论文地址：https://arxiv.org/abs/1805.09501v1
+  - 有25个子策略组合，每个子策略都包含两种变换
+  - 子策略的调节概率是基于ImageNet数据集搜索出来的，可能泛化性不好
+  - ![Alt text](../image_resources/AutoAugment.png)
+
+- RandAugment  **归一化前**
+  - 论文地址：https://arxiv.org/pdf/1909.13719.pdf
+  - 与 AutoAugment 类似，但不是指定数据集搜索，而是采用随机的方式，所有的子策略都会以同样的概率被选择
+  - ![Alt text](../image_resources/RandAugment.png)
+  - RandAugment 是在 uint8 数据格式上转换的，所有要放在归一化操作之前
+  - 有两个参数
+    - num_layers  子策略中组合几种变换，数值越大变换越复杂
+    - magnitude  决定每个增强操作的程度，数值越大变换越剧烈
+  - ```
+    - RandAugment:
+            num_layers: 2
+            magnitude: 5
+    ```
+- TimmAutoAugment  **归一化前**
+  - github地址：https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/auto_augment.py
+  - 是对AutoAugment和RandAugment的改进，目前很多地方使用
+  - ```
+    - TimmAutoAugment:
+            config_str: rand-m9-mstd0.5-inc1
+            interpolation: bicubic
+            img_size: 224
+    ```
+
+##### 图像擦除/裁剪类   **归一化后** 
+  - 归一化后，擦除的内容，保持黑色
+  - CutOut
+    - ![Alt text](../image_resources/Cutout.png)
+    - ```
+      - Cutout:
+            n_holes: 1
+            length: 112
+      ```
+  - RandomErasing
+    - 论文：https://arxiv.org/pdf/1708.04896.pdf
+    - ![Alt text](../image_resources/RandomErasing.png)
+    - ```
+      - RandomErasing:
+            EPSILON: 0.25
+            sl: 0.02
+            sh: 1.0/3.0
+            r1: 0.3
+            attempt: 10
+            use_log_aspect: True
+            mode: pixel
+      ```
+
+##### 图像混叠类
+  - 是**针对Batch后的数据进行混合**，开启后label有混叠，不能计算准确率，不能使用topk指标
+  - 对一个Batch内的数据进行混叠
+  - 开启后，训练集更困难，准确率较低，但是模型泛化能力好，验证集精度会高很多！！！
+  - Mixup
+    - 论文：https://arxiv.org/pdf/1710.09412.pdf
+    - 直接将两张图相加
+    - ![Alt text](../image_resources/Mixup.png)
+    - ```
+      batch_transform_ops:
+        - MixupOperator:
+            alpha: 0.2
+      ```
+  - Cutmix
+    - 论文：https://arxiv.org/pdf/1905.04899v2.pdf
+    - 从一副图中随机裁剪出一个ROI，然后覆盖到当前图像中的相应位置
+    - ![Alt text](../image_resources/CutMix_label.png)
+    - 新的label是两个label的加权平均
+    - ![Alt text](../image_resources/CutMix.png)
+    - ```
+      batch_transform_ops:
+        - CutmixOperator:
+            alpha: 0.2
+      ```
+
+
 
 ### 验证
 

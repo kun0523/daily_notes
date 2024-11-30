@@ -1,0 +1,1 @@
+python ..\PaddleDetection\tools\train.py -c config.yaml --use_vdl=true --vdl_log_dir=vdl_dir\scalar --eval

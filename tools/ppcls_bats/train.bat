@@ -1,0 +1,1 @@
+python E:\le_ppcls\PaddleClas\tools\train.py -c config.yaml

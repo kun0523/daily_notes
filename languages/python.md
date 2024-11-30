@@ -16,6 +16,29 @@ deactivate
 rm -rf env  // 删除指定的虚拟环境
 ```
 
+- 使用conda 创建虚拟环境
+```bash
+conda create -n demo_env python=3.10
+conda activate demo_env
+
+conda create -p d:\envs\demo_env python=3.10
+conda activate d:\envs\demo_env
+
+conda env remove -n demo_env  删除指定的虚拟环境
+```
+
+## 程序打包
+### Pyside6-deploy
+- `pyside6-deploy main.py --init`
+  - 产生config文件
+  - main.py 文件中包含整个APP的入口函数
+
+- `pyside6-deploy -c pysidedeploy.spec`
+  - 根据config文件进行打包
+
+- 问题：
+  - 使用skl2onnx 库，会出现打包失败，找不到源码的问题，未解决
+
 
 ## 常用的三方库
 
@@ -108,6 +131,17 @@ print(x.get('http://httpbin.org/cookies').text)
 
 exit(0)
 ```
+
+### pyQt
+- IDE: Qt Creator
+- 需要的库：
+  - `pyqt5`
+  - `pip install pyside6`
+- 大致开发流程：
+  - 在 `form.ui` 中设计界面，`pyside6-uic form.ui -o ui_form.py`  产生python代码（每次修改界面后，都需要执行该命令，重新生成python代码）
+  - 在 `widget.py` 中编写业务逻辑
+- 信号槽机制
+- 界面画图
 
 ## 常用的语法特性
 
@@ -225,3 +259,6 @@ print(next(res2))  # 1
 
 
 ## 小案例
+
+
+
