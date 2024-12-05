@@ -1,0 +1,1 @@
+python E:\le_ppcls\PaddleClas\tools\eval.py -c config.yaml -o Global.pretrained_model=E:\le_ppcls\crack_cls\PPLCNetV2_large\best_model

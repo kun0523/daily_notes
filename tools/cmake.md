@@ -693,4 +693,23 @@ target_link_libraries(scf_anomaly_detect PUBLIC my_logger)
 ```
 
 
+# 《CMake构建实战》
+
+## 构建的基本原理
+
+## CMake基本语法
+
+## CMake常用命令
+
+## 模块使用
+
+## 案例
+
+### Boost 头文件库使用
+- 头文件库（header-only library）指只包含头文件（.h .hpp）的程序库
+- 只需要引用它的头文件，无需对库本身进行额外的编译；
+
+
+
+
 

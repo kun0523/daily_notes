@@ -1,5 +1,23 @@
 # Python
 
+## 环境搭建
+
+```bash
+python -m venv openvino_env
+openvino_env/Scripts/activate
+python -m pip install --upgrade pip  ??
+
+pip install -q "openvino>=2024.0.0" "nncf>=2.9.0"
+pip install -q "torch>=2.1" "torchvision>=0.16" "ultralytics==8.3.0" onnx tqdm opencv-python --extra-index-url https://download.pytorch.org/whl/cpu
+
+python -c "from openvino.runtime import Core"  # 如果没有输出即成功，有报错信息则需要下载官方包进行初始化
+```
+
+- 下载官方库：`https://storage.openvinotoolkit.org/repositories/openvino/packages/2024.4/windows/w_openvino_toolkit_windows_2024.4.0.16579.c3152d32c9c_x86_64.zip`
+- 解压后，在虚拟环境下执行脚本，`setupvars.bat`
+
+
+
 ```python
 import os
 import cv2

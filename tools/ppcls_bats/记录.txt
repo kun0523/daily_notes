@@ -1,0 +1,10 @@
+- 使用流程：
+0. config.yaml  修改配置文件  模型选择   数据集修改   数据增强方法   学习率   Epoch修改等
+1. train.bat	训练模型
+2. eval.bat		验证模型效果
+3. predict.bat	模型推理
+4. export.bat	模型导出为静态图
+5. fixInputShape.bat	固定模型输入图像的尺寸
+6. export2onnx.bat	导出为onnx模型文件
+
+
