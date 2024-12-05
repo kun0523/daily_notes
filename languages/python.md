@@ -3,7 +3,13 @@
 ## Ubuntu使用Python
 
 ### 搭建虚拟环境
-```bash
+- 配置源
+```sh
+>> pip config get global.index-url  # 查看现在的源
+>> pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+```
+
+```sh
 sudo apt update
 sudo apt install python3 python3-venv
 mkdir proj1
@@ -15,7 +21,6 @@ deactivate
 
 rm -rf env  // 删除指定的虚拟环境
 ```
-
 
 ## 常用的三方库
 
