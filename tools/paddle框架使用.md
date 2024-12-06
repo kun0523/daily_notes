@@ -448,6 +448,10 @@ Metric|描述评价指标
   - 图像分类、目标检测、语义分割、实例分割
   - 结构分析、表格识别、文本检测、文本识别
   - 时间序列的分类、预测、异常检测
+
+- Paddlex是怎么组织成Pipeline的？
+  - 例如人脸识别：人脸检测+向量匹配，这个流程是怎么串起来的？怎么更换模型？
+  - 在Pipeline config中配置 detect 模型路径和 recognition 模型路径，然后在调用Pipeline时就会使用相应的模型
   
 ### 安装
 
@@ -549,18 +553,193 @@ Metric|描述评价指标
   |80|1|8|0.00005|0.929|
 
 
-  ### 案例：时序-电力预测
+### 案例：时序-电力预测
 
-  #### 模型选项与数据准备
+#### 模型选项与数据准备
 
-  #### 模型训练
+#### 模型训练
 
-  #### 模型评估与调优
+#### 模型评估与调优
 
-  #### 模型部署与服务调用
+#### 模型部署与服务调用
 
-  #### 多模型融合时序预测
+#### 多模型融合时序预测
 
+### 案例：人脸识别
+
+#### 整体流程
+1. 使用yolo算法检测人脸区域
+2. 使用ResNet算法训练人脸分类
+3. 使用训练好的ResNet网络提取图片特征，做特征向量匹配
+4. 使用Paddlex Pipeline将整个流程串联起来
+
+#### 环境配置
+```sh
+# 安装 paddle
+python -m pip install paddlepaddle-gpu==3.0.0b2 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+
+# 安装 paddlex
+git clone https://github.com/PaddlePaddle/PaddleX.git
+cd PaddleX
+pip install -e .
+paddlex --install PaddleXXX  # PaddleClas PaddleDetection PaddleSeg PaddleOCR PaddleTS  PaddleNLP
+
+# 安装三方库
+
+```
+
+#### 人脸检测模型优化
+- 四种可选模型
+  - BlazeFace / BlazeFace-FPN-SSH / PicoDet_LCNet_x2_5_face / PP-YOLOE_plus-S_face
+- 数据校验
+  > `python path/to/Paddlex/main.py -c paddlex/configs/face_detection/PP-YOLOE_plus-S_face.yaml -o Global.mode=check_dataset -o Global.dataset_dir=path/to/dataset`
+  - 数据组织格式可选：LabelMe  VOC  COCO
+  - 通过改 `CheckDataset.convert, CheckDataset.split` 可以转换数据集格式和切分比例
+- 模型训练
+  >`python path/to/Paddlex/main.py -c paddlex/configs/face_detection/PP-YOLOE_plus-S_face.yaml -o Global.mode=train -o Global.dataset_dir=path/to/dataset -o Global.device=gpu:0 -o Global.output=output_base -o Train.epochs_iters=25 -o Train.learning_rate=0.0001`
+  - xx.pdiparams  静态图网络参数
+  - xx.pdmodel  静态图网络结构
+  - xx.pdparams  动态图网络结构和参数
+- 模型评估
+  >`python path/to/Paddlex/main.py -c paddlex/configs/face_detection/PP-YOLOE_plus-S_face.yaml -o Global.mode=evaluate -o Global.dataset_dir=path/to/dataset -o Global.device=gpu:0 -o Global.output=output_base -o Evaluate.weight_path=path/to/model.pdparams`
+  - 注意：评估时需要指定要评估的模型文件
+  
+- 模型推理
+  >`python path/to/Paddlex/main.py -c paddlex/configs/face_detection/PP-YOLOE_plus-S_face.yaml -o Global.mode=predict -o Global.dataset_dir=path/to/dataset -o Global.device=gpu:0 -o Global.output=output_base -o Predict.model_dir=path/to/best_model/inference -o Predict.input=path/to/test_image`
+
+#### 人脸识别模型优化
+- 有两种人脸特征模型
+  - MobileFaceNet, ResNet50_face
+  
+- 数据校验
+  > `python path/to/Paddlex/main.py -c paddlex/configs/face_recognition/ResNet50_face.yaml -o Global.mode=check_dataset -o Global.dataset_dir=path/to/dataset`
+  - 数据组织形式：图片/类别 + label.txt
+  
+- 模型训练
+  >`python path/to/Paddlex/main.py -c paddlex/configs/face_recognition/ResNet50_face.yaml -o Global.mode=train -o Global.dataset_dir=path/to/dataset -o Global.device=gpu:0 -o Global.output=output_base -o Train.epochs_iters=25 -o Train.learning_rate=0.0001`
+  - xx.pdiparams  静态图网络参数
+  - xx.pdmodel  静态图网络结构
+  - xx.pdparams  动态图网络结构和参数
+- 模型评估
+  >`python path/to/Paddlex/main.py -c paddlex/configs/face_recognition/ResNet50_face.yaml -o Global.mode=evaluate -o Global.dataset_dir=path/to/dataset -o Global.device=gpu:0 -o Global.output=output_base -o Evaluate.weight_path=path/to/model.pdparams`
+  - 注意：评估时需要指定要评估的模型文件
+  
+- 模型推理
+  >`python path/to/Paddlex/main.py -c paddlex/configs/face_recognition/ResNet50_face.yaml -o Global.mode=predict -o Global.dataset_dir=path/to/dataset -o Global.device=gpu:0 -o Global.output=output_base -o Predict.model_dir=path/to/best_model/inference -o Predict.input=path/to/test_image`
+
+#### 特征库
+- 图片库
+  ```
+  |---images
+  |   |---ID0
+  |   |   |---xxx.jpg
+  |   |   |---xxx.jpg
+  |   |---ID1
+  |   |   |---xxx.jpg
+  |   |   |---xxx.jpg
+  |
+  |---gallery.txt
+
+  ```
+- 特征库构建
+  ```python
+  from paddlex import create_pipeline
+  pipeline = create_pipeline(pipeline='face_recognition')
+  index_data = pipeline.build_index(gallery_imgs='path/to/gallery', gallery_label='path/to/gallery.txt')
+  index_data.save("face_index")
+  ```
+- 特征库修改
+  ```python
+  from paddlex import create_pipeline
+
+  pipeline = create_pipeline("face_recognition")
+  index_data = pipeline.build_index(gallery_imgs="path/to/gallery", gallery_label="path/to/gallery.txt", index_type="Flat")
+  index_data.save("face_index_base")
+
+  index_data = pipeline.remove_index(remove_ids="path/to/remove_ids.txt", index="face_index_base")
+  index_data.save("face_index_del")
+
+  index_data = pipeline.append_index(gallery_imgs="path/to/gallery", gallery_label="path/to/gallery.txt", index="face_index_del")
+  index_data.save("face_index_add")
+
+  ```
+- 效果测试
+  ```python
+  from paddlex import create_pipeline
+
+  pipeline = create_pipeline(pipeline="face_recognition")
+  output = pipeline.predict("path/to/test_image", index="path/to/index")
+  for res in output:
+    res.print()
+    res.save_to_img("./output")
+  ```
+
+
+#### 集成
+- 修改配置文件
+  - `Paddlex/paddlex/pipelines/face_recognition.yaml`
+  ``` yaml
+  Global:
+    pipeline_name: face_recognition
+    input: https://paddle-model-ecology.bj.bcebos.com/paddlex/imgs/demo_image/friends1.jpg
+
+  Pipeline:
+    det_model: "/root/ppx/face_rec/task03/output_bs8_lr0001_ep20/best_model/inference"
+    rec_model: "/root/ppx/face_rec/task04/output_base/best_model/inference"
+    det_batch_size: 1
+    rec_batch_size: 1
+    device: gpu
+    index: None
+    score_thres: 0.4
+    return_k: 5
+  ```
+
+- python脚本调用
+  ```python
+  from paddlex import create_pipeline
+
+  pipeline = create_pipeline(pipeline="face_recognition")
+  index_data = pipeline.build_index(gallery_imgs="path/to/img_gallery", gallery_label="path/to/img_gallery/gallery.txt")
+  output = pipeline.predict("path/to/test_img", index=index_data)
+  for res in output:
+    res.print()
+    res.save_to_img("./output")
+  ```
+
+- 服务部署
+  - `paddlex --install serve` 安装服务插件
+  - `paddlex --get_pipeline_config face_recognition --save_path ./`  下载指定的pipeline配置文件
+  - 修改所使用的模型路径
+  - `paddlex --serve --pipeline path/to/face_recognition.yaml`  启动服务，即可使用http请求进行访问
+  - 客户端代码
+    ```python
+    import base64
+    import pprint
+    import sys
+    import requests
+
+    API_BASE_URL = "http://0.0.0.0:8899"
+    infer_image_path = "../cartoonface_demo_gallery/test_images/cartoon_demo.jpg"
+    with open(infer_image_path, "rb") as file:
+        image_bytes = file.read()
+        image_data = base64.b64encode(image_bytes).decode("ascii")
+
+    payload = {"image":image_data}
+    resp_infer = requests.post(f"{API_BASE_URL}/face-recognition-infer", json=payload)
+    if resp_infer.status_code != 200:
+        print(f"Request to face-recognition-infer failed with status code {resp_infer}.")
+        pprint.pp(resp_infer.json())
+        exit(1)
+    result_infer = resp_infer.json()["result"]
+
+    output_image_path = "./out.jpg"
+    with open(output_image_path, "wb") as file:
+        file.write(base64.b64decode(result_infer["image"]))
+
+    print(f"Output image save at {output_image_path}")
+    print("\nDetected face:")
+    pprint.pp(result_infer["faces"])
+    ```
 
 ## 部署（FastDeploy）
 - FastDeploy API: `https://baidu-paddle.github.io/fastdeploy-api/`
