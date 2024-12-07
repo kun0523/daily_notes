@@ -1,5 +1,11 @@
 # PaddlePaddle
 
+## Paddle 3.0
+- 3.0 开始 .whl 包中包含了 CUDA。CUDNN 等库，不需要提前安装了
+- 
+### 环境安装
+
+
 ## PaddleCls
 
 ### 环境搭建
