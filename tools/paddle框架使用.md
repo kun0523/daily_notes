@@ -453,6 +453,36 @@ Metric|描述评价指标
   - 例如人脸识别：人脸检测+向量匹配，这个流程是怎么串起来的？怎么更换模型？
   - 在Pipeline config中配置 detect 模型路径和 recognition 模型路径，然后在调用Pipeline时就会使用相应的模型
   
+### 各插件模块
+
+#### PaddleClas
+- LCNet
+- HGNet
+  - High-Performance GPU Network 
+  - 更适用于GPU的高性能骨干网络
+  - 尽可能多的使用3x3标准卷积
+
+
+|模型名称|配置文件|模型文件大小|Openvino推理耗时|备注|
+|---|---|---|---|---|
+|HGNet|PP-HGNetV2-B6.yaml|279MB|105ms|i7-10700 训练特别慢|
+|HGNet|PP-HGNetV2-B4.yaml|68MB|22ms|i7-10700|
+|HGNet|PP-HGNetV2-B1.yaml|16MB|6ms|i7-10700|
+|LCNet|PP-LCNetV2_large|35MB|10ms|i7-10700|
+|LCNet|PP-LCNetV2_small|11MB|5ms|i7-10700 准确率竟然和B4差不多|
+|ResNet|ResNet50_vd.yaml|90MB|28ms|i7-10700  能力和B4差不多|
+|MobileNet|MobileNetV4_conv_small.yaml|9.6MB||学习能力不足|
+
+
+#### PaddleDetection
+
+#### PaddleSeg
+
+#### PaddleOCR
+- TextDetection
+- TextOrientation
+- TextRecognition
+
 ### 安装
 
 - 有两种安装模式：
@@ -753,12 +783,11 @@ paddlex --install PaddleXXX  # PaddleClas PaddleDetection PaddleSeg PaddleOCR Pa
   PROJECT(infer_demo CXX)
   set(FASTDEPLOY_INSTALL_DIR "E:\\cpp_packages\\FastDeploy\\fastdeploy-win-x64-0.0.0")
   include(${FASTDEPLOY_INSTALL_DIR}/FastDeploy.cmake)
-  # fastdeploy 需要include的头文件目录
-  include_directories(${FASTDEPLOY_INCS})
 
   # Only Cls
   add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/infer_onnx_openvino.cc)
   # 添加FastDeploy库依赖
+  target_include_directories(${PROJECT_NAME} PUBLIC ${FASTDEPLOY_INCS})
   target_link_libraries(${PROJECT_NAME} ${FASTDEPLOY_LIBS})
   ```
 
