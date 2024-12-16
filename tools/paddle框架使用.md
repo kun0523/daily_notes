@@ -446,6 +446,48 @@ Metric|描述评价指标
     - 英文字符字典: `https://gitee.com/paddlepaddle/PaddleOCR/raw/release/2.6/ppocr/utils/en_dict.txt`
 
 
+## PaddleSpeech
+
+### 环境
+```sh
+pip install paddlespeech
+pip install scipy==1.7.3  # 版本过高会导致接口不存在报错
+```
+
+
+### 测试
+```python
+from paddlespeech.cli.tts import TTSExecutor
+
+tts_executor = TTSExecutor()
+wav_file = tts_executor(
+    text="你好，小王,今天又是天气美好的一天",
+    output = "output.wav",
+    am='fastspeech2_mix',
+    voc = 'fastspeech2_male',
+    lang='mix',
+    spk_id=174
+)
+
+'''
+Model name must be one of 
+['speedyspeech_csmsc-zh', 'fastspeech2_csmsc-zh', 
+'fastspeech2_canton-canton', 'fastspeech2_ljspeech-en', 
+'fastspeech2_aishell3-zh', 'fastspeech2_vctk-en', 
+'fastspeech2_cnndecoder_csmsc-zh', 'fastspeech2_mix-mix', 
+'fastspeech2_male-zh', 'fastspeech2_male-en', 
+'fastspeech2_male-mix', 'tacotron2_csmsc-zh', 
+'tacotron2_ljspeech-en', 'pwgan_csmsc-zh', 'pwgan_ljspeech-en', 
+'pwgan_aishell3-zh', 'pwgan_vctk-en', 'pwgan_male-zh', 
+'mb_melgan_csmsc-zh', 'style_melgan_csmsc-zh', 'hifigan_csmsc-zh', 
+'hifigan_ljspeech-en', 'hifigan_aishell3-zh', 'hifigan_vctk-en', 
+'hifigan_male-zh', 'wavernn_csmsc-zh', 'fastspeech2_mix-zh', 
+'fastspeech2_mix-en', 'pwgan_male-en', 'pwgan_male-mix', 
+'hifigan_male-en', 'hifigan_male-mix'
+'''
+```
+
+
 ## 低代码平台 PaddleX
 
 - Paddlex工作流程
