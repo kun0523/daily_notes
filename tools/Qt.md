@@ -1,19 +1,22 @@
-# Qt 桌面应用开发
+# Qt
+
+## 常用组件介绍
+
+- QCore
+- 
+- QQuick
+  - QML
+
+- 前后端分离
+  - 前端：QML
+  - 后端：C++
 
 ## QML
 
+- `path/to/qml.exe path/to/main.qml` 运行 QML 文件
+  - `D:\Qt\6.4.3\mingw_64\bin\qml.exe`
 
-## PySide
+### 常用控件
 
-### 第一个小Demo
-```main.py
+### 常用布局
 
-```
-
-```qml_01.qml
-
-```
-
-## Qt Cpp
-
-### 第一个小Demo

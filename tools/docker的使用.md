@@ -4,7 +4,6 @@
 - 
 
 ## `Image` 管理
-
 - `docker pull <image>` 从Docker Hub拉取指定镜像
 - `docker images`  查看当前本地有的镜像
 - `docker rmi <image>`  删除指定的镜像

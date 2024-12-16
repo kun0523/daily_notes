@@ -4,6 +4,8 @@
 
 - `CMake, Tests and Tooling for CC++ Projects [2022 Edition] ch02--09`
 
+- `Udemy: Complete CMake Project Management [2024] - ch5/13 -- 3`
+
 ## VSCode 使用
 - 安装扩展：`C/C++ Extension Pack`  
 - `ctrl+shift+p`  打开指令窗口快捷键
@@ -13,9 +15,16 @@
 
 - `mingw-64` 下载路径：`https://github.com/niXman/mingw-builds-binaries/releases/x86_64-13.2.0-release-posix-seh-ucrt-rt_v11-rev0.7z`
 
+
+
+## 问题：
+
+1. 将不同的库放在不同文件夹后，编译生成的库文件都分散在不同文件夹中，怎么链接到可执行文件上？
+2. 库的头文件，在各自的文件夹下，怎么让app文件可以找到对应的头文件？？
+
 ## CMake 命令
 
-### CMake 命令行指定
+### CMake 命令行指令
 - 生成MakeFile  `cmake -S dir/to/src_files -B dir/to/make_files`
 - 编译项目： `cmake --build dir/to/make_files`
   - `cmake --build dir/to/make_files --target target_name`  指定要编译的对象，可以只编译库文件
@@ -23,54 +32,121 @@
   - ```bash
     rmdir /S /Q build
     mkdir build
-    cmake -S . -B build -DCOMPILE_APP=ON 
+    cmake -S . -B build -DCOMPILE_APP=ON  # -S 指定源路径  -B 指定生成的路径  -D 定义外部变量
     cmake --build build --config Release  # 使用vscode时，需要在编译时指定是Debug还是Release
     ```
 
 ### CMakeLists 指令
 
-#### 变量与函数的定义
+#### :cactus: 变量
+- :star:**变量是大小写敏感的**
 
-  - `String`
-  - `Number`
-  - `List`  使用空格 或 分号 分隔
-  - `Path`
-  - `Boolean`
-    - TRUE ON YES Y 1 
-    - FALSE OFF NO N 0 IGNORE NOTFOUND
-    - `option(<variable> <"help_text"> [value])`
-    - `if()  elseif()  else()  endif()`
-    - `AND OR NOT`
-    - `GREATER LESS IN_LIST STREQUAL`
+- `String`
+- `Number`
+- `List`  使用空格 或 分号 分隔
+- `Path`
+- `Boolean`
+  - TRUE ON YES Y 1 
+  - FALSE OFF NO N 0 IGNORE NOTFOUND
+  - `option(<variable> <"help_text"> [value])`
+  - `if()  elseif()  else()  endif()`
+  - `AND OR NOT`
+  - `GREATER LESS IN_LIST STREQUAL`
 
+####  :coffee: 常用函数
+- :star:**指定是大小写不敏感的**
+
+- `cmake_minimum_required`
+  - 指定cmake的最低版本
+  - `cmake_minimum_required(VERSION 3.10)`
+  
+- `project(<project_name> [CXX] [C] [Java] [Python])`
+  - 定义项目名称，语言类型
+  - 例如：`project(MyProject CXX)`
+  
 - 通过`message`可以打印信息
   - `message("Hello, CMake!")`  
-  - `message(STATUS "Hello, CMake!")`  STATUS 控制输出的形式，还可以用`WARNING`  `FATAL_ERROR`(不执行后续操作)  `SEND_ERROR`(打印错误信息，可继续执行后续步骤)
+  - `message(STATUS "Hello, CMake!")`  
+  - STATUS 控制输出的形式，
+  - 还可以用`WARNING`  
+  - `FATAL_ERROR`(不执行后续操作)  
+  - `SEND_ERROR`(打印错误信息，可继续执行后续步骤)
+  
 - 通过 set 设置变量，允许后续用户修改对应的值，例如依赖库的位置、选择机器架构等
   - `set(<variable> <value> CACHE <type> <docstring>)`  设置变量
   - `message(STATUS ${variable})`  使用变量 `${var}`
-- 可选的type:
-  1. FILEPATH    可以打开一个选择文件的窗口
-  2. PATH            可以打开一个选择文件夹的窗口
-  3. STRING        任意的字符串
-  4. BOOL            布尔值，显示一个checkbox 表征 ON/OFF
-  5. INTERNAL    无GUI 入口，用于开发者设定好的变量，不允许用户修改
-- 用户选择的结果，会以 key-value pairs 的方式，保存在 CMakeCache.txt 中
-
+  - 可选的type:
+    1. FILEPATH    可以打开一个选择文件的窗口
+    2. PATH            可以打开一个选择文件夹的窗口
+    3. STRING        任意的字符串
+    4. BOOL            布尔值，显示一个checkbox 表征 ON/OFF
+    5. INTERNAL    无GUI 入口，用于开发者设定好的变量，不允许用户修改
+  - 用户选择的结果，会以 key-value pairs 的方式，保存在 CMakeCache.txt 中
+  
 - 从命令行传参：
   - `cmake -S . -B build_dir -DMY_OUTSIDE_VAR=5`  外部定义变量以 `-D` 开头
   - `message(STATUS ${MY_OUTSIDE_VAR})` 打印外部定义的变量
+  
+- :ice_cream: 生成可执行文件： 
+  - `add_executable(<target> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ...)`
+  - 生成可执行文件
+  - `WIN32`  指定生成的可执行文件是Windows平台的
+  - `MACOSX_BUNDLE`  指定生成的可执行文件是Mac平台的
+  
+- :ice_cream: 生成库文件
+  - `add_library(<target> [STATIC | SHARED | MODULE] [EXCLUDE_FROM_ALL] source1 source2...)`
+  
+- 添加子目录
+  - `add_subdirectory(<dir> [EXCLUDE_FROM_ALL])`
+  - 用于添加子目录，子目录的CMakeLists.txt文件会被执行
+  - 子目录的CMakeLists.txt文件中，可以使用父目录的变量
+  
+- :icecream: 添加依赖
+  - `target_link_libraries(<target> PRIVATE|INTERFACE|PUBLIC <libname>...)`
+  - 用于指定目标库的依赖关系
+  - `PRIVATE`  仅当前目标可见
+  - `INTERFACE`  仅接口可见
+  - `PUBLIC`  接口和当前目标可见
+  
+- :icecream: 添加include文件
+  
+  1. 为自己添加 include 文件路径
+  2. 为调用方开放 include 文件路径
+  
+  - `target_include_directories(<target> [PUBLIC|PRIVATE] <include_dir>...)`
+    - :star2: 如果是 `PRIVATE` 在该头文件，不能出现在调用方的头文件中，**只能出现在 cpp 文件中**
+  
+- 收集文件名
+  
+  - `file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h")`   找出指定路径下所有的头文件，并赋值给变量 `HEADERS`
+  
+    ```cmake
+    project(Test)
+    file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h")
+    file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp")
+    
+    add_library(
+    	${PROJECT_NAME}
+    	${HEADERS}
+    	${SOURCES}
+    )
+    ```
+  
+    
+  
 - 进行数据计算
   - `math(EXPR <output_var> <expression>)`
   - `math(EXPR NUM "${NUM}+1")`  将最后表达式的计算结果赋值给第二个参数`NUM`
+
 - 定义函数
   ```cmake
   function(my_fun my_param)
     message(STATUS ${my_param})
   endfunction()
-
+  
   my_fun(10)
   ```
+
 - 定义宏 `marco`
   - 可以直接访问全局变量，并修改全局变量
 
@@ -78,6 +154,7 @@
   - `PROJECT_NAME` 
   - 都有哪些内建变量：`https://cmake.org/cmake/help/latest/manual/cmake-variables.7.html`
   - 
+
 - 定义预处理符号
 
   - add_definitions
@@ -105,10 +182,10 @@
     - 在cmake时，通过 `cmake dir/to/cmakelists -DUSE_MYLIB=OFF`  设定
     - 为了加速编译过程，cmake会自动产生`CMakeCache.txt`文件，里面存了变量的值，直接改`CMakeLists.txt`文件并不会使`Cache`文件内容发生改变，需要手动删除后，重新生成
   - `if`
-  
+
     - ```cmake
       option(BuildExample "wheather or not to build example" False)
-
+      
       if(BuildExample)
           message(STATUS "Build Example")
       endif()
@@ -136,34 +213,34 @@ b1244ee4e1e669f15e328a17338bdab1a5afc039
 - 创建函数
   - `function(my_func argument)   endfunction()`
   
-#### 常用的预定义变量
+#### :facepunch: 常用的预定义变量
 
 - `PROJECT_NAME`  项目名称
 - `CMAKE_SOURCE_DIR` / `PROJECT_SOURCE_DIR`  项目根目录
+- `CMAKE_CURRENT_SOURCE_DIR`  当前 `CMakeLists.txt` 文件的路径
 - `CMAKE_RUNTIME_OUTPUT_DIRECTORY`  编译生成的目录(将项目中生成的二进制文件存到该目录下)
 - `CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS`
   - 当编译静态库（STATIC）时 不需要设置
   - **当编译动态库（SHARED）时 需要设置为ON**
 
+#### :taco: 常用的预定义函数
 
-#### 常用的预定义函数
+- add_library  生成库文件
+  - `add_library(lib_name source_file.cxx)` 
+  - 在库目录的 CMakeLists 中使用，生成库文件
+
+- 
 
 - `include()`  导入`cmake`模块 （`xxx.cmake`）
-
-- find_package
+-  find_package
   - 第三方库的作者以及维护好了  package_name.cmake 文件，例如 OpenVINOConfig.cmake
   - find_package(OpenVINO REQUIRED)
   - 配合 target_link_libraries 使用 链接动态库
   - 当你使用 `find_package` 导入一个库时，实际上是在告诉 CMake 去查找这个库的配置文件，通过这些配置文件，CMake 知道了库的具体安装位置和相关信息，从而能够正确地包含头文件和链接库，使得编译过程更加自动化和方便。
-
-- add_library
-  - `add_library(lib_name source_file.cxx)` 
-  - 在库目录的 CMakeLists 中使用，生成库文件
-
+- - 
 - target_link_libraries
   - 是用来链接实际的库文件到目标上，它指定了要与目标一起链接的库。
   - 在 `add_executable()`  之后使用
-  - 常用
   - 如果库文件的cmakelists中，使用了 interface，即不需要在主cmakelists中指定头文件路径
     - `target_include_directories(MathFunctions INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})`  在库文件中指定，调用方仅需要使用 target_link_libraries，而不需要再指定头文件目录
     - 
@@ -172,19 +249,15 @@ b1244ee4e1e669f15e328a17338bdab1a5afc039
   - 指定查找库**头文件**的路径
   - 在 `add_executable()`  之后使用
   - 可多次使用，添加多个库目录
-
 - target_link_directories
   - `target_link_directories` 用于指定在链接过程中搜索库文件的目录，告诉链接器在这些目录中查找要链接的库。
-
 - target_compile_definitions
   - 将cmake中定义的变量 传递到源文件中
   - `target_compile_definitions(MathFunctions PRIVATE "USE_MYMATH")`
     - 将 `USE_MYMATH` 作为预定义的符号传入
     - 可用于控制源文件中使用不同的实现方式
-
 - include_directories
   - `include_directories` 指定了包含目录，以便编译器能够找到 `mylib.h` 头文件
-
 - aux_source_directory
   - `aux_source_directory(<dir> <variable>)` 
     - 将指定的 dir 中的源文件路径，保存在 variable 中
@@ -220,13 +293,13 @@ b1244ee4e1e669f15e328a17338bdab1a5afc039
   - ```cpp    
     #pragma once
     // config.hpp.in  输入文件
-
+    
     #include <cstdint>
     #include <string_view>
-
+    
     static constexpr std::string_view project_name = "@PROJECT_NAME@";
     static constexpr std::string_view project_version = "@PROJECT_VERSION@";
-
+    
     static constexpr std::int32_t project_version_major{@PROJECT_VERSION_MAJOR@};
     static constexpr std::int32_t project_version_minor{@PROJECT_VERSION_MINOR@};
     static constexpr std::int32_t project_version_patch{@PROJECT_VERSION_PATCH@};
@@ -244,7 +317,7 @@ b1244ee4e1e669f15e328a17338bdab1a5afc039
 - 可以使用FetchContent 方法，直接获取github代码进行生成
 - ```cmake
   include(FetchContent)
-
+  
   FetchContent_Declare(
       nlohmann_json
       GIT_REPOSITORY https://github.com/nlohmann/json
