@@ -341,6 +341,52 @@ b1244ee4e1e669f15e328a17338bdab1a5afc039
 
 ### 三方库管理
 
+# 案例：编译OpenCV
+
+## 下载源码
+- `https://github.com/opencv/opencv.git`
+- `https://github.com/opencv/opencv_contrib.git`
+
+## CMake生成
+- 配置 SourceCode 路径
+- 配置 BuildBinaries 路径
+- `Configure` --> 解析工程配置项  选择编译工具
+- 修改 `OPENCV_EXTRA_MODULES_PATH=path/to/opencv_contrib/modules`
+- 再次刷新 `Configure`
+- `Generate` --> 生成 VS 工程文件 .sln
+- ![Opencv CMake 配置](../image_resources/OpenCV_cmake.png)
+
+## VS编译
+- 打开VS工程文件后，`CMakeTargets --> INSTALL` 右键生成
+- 编译两次 `Debug/Release`
+- ![Opencv VS 编译](../image_resources/opencv_vsbuild.png)
+
+## 调用测试
+- `CMakeLists.txt`
+  ```cmake
+  cmake_minimum_required(VERSION 3.17)
+  project(TestDependences)
+
+  set(CMAKE_PREFIX_PATH "E:\\Dependences\\OpenCV\\opencv_build")
+  find_package(OpenCV REQUIRED)
+
+  add_executable(${PROJECT_NAME} main.cpp)
+  target_link_libraries(${PROJECT_NAME} PUBLIC ${OpenCV_LIBS})
+  ```
+
+- `main.cpp`
+  ```cpp
+  #include <iostream>
+  #include <opencv2/opencv.hpp>
+
+  void main(){
+      std::string img_pth{R"(E:\DataSets\TmpDLTrainData\detection\pokemon_det\fix_size\283_2048_1732872505861.jpg)"};
+      auto im = cv::imread(img_pth);
+      cv::imshow("TEST", im);
+      cv::waitKey(0);     
+  }
+  ```
+
 
 # 案例：编译自定义的库
 

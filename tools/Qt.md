@@ -9,7 +9,7 @@
 
 - 前后端分离
   - 前端：QML
-  - 后端：C++
+  - 后端：C++ / Python
 
 ## QML
 
@@ -20,3 +20,11 @@
 
 ### 常用布局
 
+![Alt text](image.png)
+
+
+### Signal Slots
+
+#### QML向Python传递数据
+
+#### Python向QML传递数据

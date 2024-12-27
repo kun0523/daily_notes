@@ -819,6 +819,18 @@ paddlex --install PaddleXXX  # PaddleClas PaddleDetection PaddleSeg PaddleOCR Pa
     pprint.pp(result_infer["faces"])
     ```
 
+### 案例：异常侦测
+
+#### 整体流程
+
+#### 环境配置
+
+#### 数据集标注
+
+#### 模型训练
+
+
+
 ## 部署（FastDeploy）
 - FastDeploy API: `https://baidu-paddle.github.io/fastdeploy-api/`
 
