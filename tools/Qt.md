@@ -20,7 +20,7 @@
 
 ### 常用布局
 
-![Alt text](image.png)
+![Alt text](../image_resources/qt_base_layout.png)
 
 
 ### Signal Slots

@@ -198,6 +198,49 @@ for(int i=0; i<26; ++i){
 }
 printf("%s\n", alphabeta);
 ```
+## 使用iostream
+### `std::fstream` 读写二进制文件
+    - 以二进制形式保存文件可以减少文件大小，加快读写速度；
+```cpp
+    // read from binary file
+    int num;
+    std::ifstream infile("output.bin", std::ios::binary);
+    while(infile.read(reinterpret_cast<char*>(&num), sizeof(num))){
+        std::cout << num << std::endl;
+    }
+    infile.close();
+    return 0;
+
+    // write to binary file
+    int numbers[]{1'000'000, 2'000'000, 3'000'000, 4'000'000, 5'000'000};
+
+    std::ofstream outFile1("output.bin", std::ios::binary);
+    if(outFile1.is_open()){
+        outFile1.write(reinterpret_cast<const char*>(&numbers), sizeof(numbers));
+    }
+    outFile1.close();
+    return 0;
+```
+
+### `std::cin`异常处理
+```cpp
+void getNumber(const char* msg, double &num, double minVal=0, double maxVal=20){
+    std::cout << msg << std::endl;
+    while(true){
+        std::cin >> num;
+        if(std::cin.fail()){
+            std::cout << "Invalid Input" << std::endl;
+            std::cin.clear();  // clear the error flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // ignore the rest of the line
+        }
+        else if(num < minVal || num > maxVal){
+            std::cout << "Number must be between " << minVal << " and " << maxVal << std::endl;
+            continue;  // continue the loop to ask for input again
+        }else break;
+    }
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // ignore the rest of the line (in case user enters something else after entering an invalid input
+}
+```
 
 ## 多态
 - 虚方法：
