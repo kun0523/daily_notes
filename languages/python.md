@@ -7,6 +7,10 @@
 ```sh
 >> pip config get global.index-url  # 查看现在的源
 >> pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+
+>> pip install openvino -i https://pypi.tuna.tsinghua.edu.cn/simple
+>> pip install openvino -i https://mirrors.aliyun.com/pypi/simple
+>> pip install openvino -i https://pypi.mirrors.ustc.edu.cn/simple
 ```
 
 ```sh
@@ -30,7 +34,13 @@ conda activate demo_env
 conda create -p d:\envs\demo_env python=3.10
 conda activate d:\envs\demo_env
 
-conda env remove -n demo_env  删除指定的虚拟环境
+pip install package_name --isolated  // 注意，有可能系统内已经有python翻译器，导致一些依赖项没有安装在指定的虚拟环境下，导致虚拟环境移植后运行报错，解决办法，将系统内已有的翻译器删除后，重新安装
+pip install package_name -t path/to/install  // 指定安装位置
+
+conda env remove -n demo_env --all  删除指定的虚拟环境
+
+conda pack -n env_name -o path/to/save/file_name.tar.gz
+conda pack -p env_path -o path/to/save/file_name.tar.gz
 ```
 
 ## 程序打包
@@ -44,6 +54,11 @@ conda env remove -n demo_env  删除指定的虚拟环境
 
 - 问题：
   - 使用skl2onnx 库，会出现打包失败，找不到源码的问题，未解决
+
+### Pyinstaller
+- `pyinstaller -F main.py -i icon.ico -n AppName -w` 
+  - `-w`  屏蔽 cmd 黑窗
+  - `-c`  保留黑窗
 
 
 ## 常用的三方库
