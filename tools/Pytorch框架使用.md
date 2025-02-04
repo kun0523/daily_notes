@@ -1,9 +1,13 @@
 # 环境安装
 
 ## GPU
-
+- 查询本机CUDA版本：
+  - 桌面右键 >> NVIDIA控制面板 >> 系统信息 >> 驱动程序版本
+  - CMD >> nvidia-smi >> Driver Version
+- 查询CUDA版本对应 Toolkit版本 `https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html`
 - `>> nvidia-smi` 查询本机GPU**所支持的最高 CUDA 版本**；
 - `>> nvcc -V`  查询**已经安装的 CUDA 版本**；
+- [CUDA](https://www.nvidia.cn/geforce/drivers/)
 - [cuda toolkit URL](https://developer.nvidia.com/cuda-toolkit-archive)
 - [torch/torchvision whl URL](https://download.pytorch.org/whl/torch_stable.html)
 
