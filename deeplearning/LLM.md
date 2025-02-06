@@ -10,6 +10,21 @@
   - `ollama list`  查看本地已有的大模型
   - `/bye`  退出交互环境
 
+- 常用命令
+  - `ollama list`  列出本地所有模型
+  - `ollama run NAME`  运行指定的模型
+  - `ollama ps`  查看运行中的模型
+  - `ollama pull`  从注册表中拉取模型
+  - `ollama rm`  删除模型
+  - `/bye`  退出
+
+- 环境变量配置：
+  - `OLLAMA_MODELS`  修改模型保存位置  改为`e:\ollama\models`
+  - `OLLAMA_HOST`  ollama服务监听的网络地址，如果想允许其他电脑访问ollama（如局域网中其他电脑）建议设置成 0.0.0.0  （默认 127.0.0.1）
+  - `OLLAMA_PORT`  监听的端口  （默认 11434）
+  - 配置完成后重启ollama
+  - 查看端口占用情况： `netstat -aon|findstr 11434`
+  - 查看占用端口的进程情况： `tasklist|findstr PID_`
 - requirements
   - `pip install ollama langchain_core langchain_ollama langchain_community langchain_chroma`
 
