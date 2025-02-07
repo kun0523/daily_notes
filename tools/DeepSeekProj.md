@@ -14,6 +14,8 @@
 - 文本总结
 - 文本生成
 - 纠正拼写错误和语法错误  `prompt=f"Correct my grammar and spelling mistakes in the following text:\n\n {text}"`
+- 命名实体抽取 `prompt = f"Extract all names entities(persons, organizations, locations, dates) from:\n\n {text}"`
+- 文本情感分析  `prompt = f"Classify the sentiment of the following text as Positive, Negative, or Neutral:\n\n {text}"`
 
 - 实例代码：
 ```python
@@ -43,7 +45,6 @@ def summarize_text(text: str):
         return response.json().get("response", "No Summary Generated")
     else:
         return f"Error: {response.text}"
-
 
 interface = gr.Interface(
     fn=summarize_text,
