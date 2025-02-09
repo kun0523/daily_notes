@@ -46,3 +46,6 @@ type(img)  // PIL Image
 img.save("test.jpg")
 ```
 
+
+## DDPM
+- Denoising Diffusion Probabilistic Models
