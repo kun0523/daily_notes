@@ -49,3 +49,16 @@ img.save("test.jpg")
 
 ## DDPM
 - Denoising Diffusion Probabilistic Models
+
+
+## AnomalyDiffusion
+
+### 使用
+- Anomaly generation
+- Mask generation
+- 基于生成的数据训练检测模型
+
+### IC-LPIPS
+
+### 算法思想
+

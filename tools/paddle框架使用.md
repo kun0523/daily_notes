@@ -505,21 +505,44 @@ Model name must be one of
 
 #### PaddleClas
 - LCNet
+  - 算法思想：基于MobileNet使用更多Trick，
+  - 核心模块：
+    - 
+  - 为什么轻量：
 - HGNet
   - High-Performance GPU Network 
   - 更适用于GPU的高性能骨干网络
   - 尽可能多的使用3x3标准卷积
+  - 
+- 训练过程：
+  - 修改config文件
+    - `mode` check_dataset, train, evaluate, predict, 
+    - `dataset_dir` 数据集，分类数据集组织形式，图片文件夹 + 类别标签txt + train txt + val txt
+    - `num_classes` 修改为自己项目的类别数
+    - `epochs_iters` 迭代次数
+    - `pretrain_weight_path`  预训练模型路径
+    - `output`  输出文件的保存路径
+  - `python main.py -c path/to/config.yaml`
+  - ``
+- 测试过程：
+  - 修改config文件
+    - `mode`  evaluate
+    - `weight_path`  训练得到的模型文件
+- 模型导出：使用`paddlex`训练时，会自动导出成`xx.pdiparams + xx.pdmodel`文件
+- 轻量化：
+  - 
 
-
-|模型名称|配置文件|模型文件大小|Openvino推理耗时|备注|
-|---|---|---|---|---|
-|HGNet|PP-HGNetV2-B6.yaml|279MB|105ms|i7-10700 训练特别慢|
-|HGNet|PP-HGNetV2-B4.yaml|68MB|22ms|i7-10700|
-|HGNet|PP-HGNetV2-B1.yaml|16MB|6ms|i7-10700|
-|LCNet|PP-LCNetV2_large|35MB|10ms|i7-10700|
-|LCNet|PP-LCNetV2_small|11MB|5ms|i7-10700 准确率竟然和B4差不多|
-|ResNet|ResNet50_vd.yaml|90MB|28ms|i7-10700  能力和B4差不多|
-|MobileNet|MobileNetV4_conv_small.yaml|9.6MB||学习能力不足|
+- 数据集：flowers-102
+- 
+|模型名称|配置文件|模型文件大小|top1|Openvino推理耗时|备注|
+|---|---|---|---|---|---|
+|HGNet|PP-HGNetV2-B6.yaml|279MB||105ms|i7-10700 训练特别慢|
+|HGNet|PP-HGNetV2-B4.yaml|68MB||22ms|i7-10700|
+|HGNet|PP-HGNetV2-B1.yaml|17MB|0.90/ep106|7ms|i7-10700|
+|LCNet|PP-LCNetV2_x2|21MB|0.88/ep38|7ms|i7-10700|
+|LCNet|PP-LCNetV2_x1|7MB|0.92/ep84|3ms|i7-10700 准确率竟然和B4差不多|
+|ResNet|ResNet50_vd.yaml|90MB||28ms|i7-10700  能力和B4差不多|
+|MobileNet|MobileNetV3_small_x1_25.yaml|9.6MB|0.92/ep72|5ms|在flower数据上表现也不错|
 
 
 #### PaddleDetection
@@ -855,3 +878,9 @@ paddlex --install PaddleXXX  # PaddleClas PaddleDetection PaddleSeg PaddleOCR Pa
   - 使用自带批处理脚本 `fastdeploy_init.bat`
   - 将所有依赖库都复制到可执行文件路径下：`fastdeploy_init.bat install Path/to/fastdeploy_root Path/to/inference.exe`
   - `E:\my_paddle\bin>E:\cpp_packages\FastDeploy\fastdeploy-win-x64-0.0.0\fastdeploy_init.bat install E:\cpp_packages\FastDeploy\fastdeploy-win-x64-0.0.0 E:\my_paddle\bin\OCR\Release`
+
+
+### 目标检测任务
+
+
+### OCR

@@ -25,7 +25,6 @@ take notes about coding
     - paddleocr
     - RapidOcr
   - StableDiffusion
-  - RL
 - LLM
   - 大模型的使用
   - Agent
@@ -34,10 +33,17 @@ take notes about coding
 
 - 0208
   - 完成两个设计模式
-  - DeepLearningBase + 5 （补充模型读写）
-  - RL + 3
-  - SD
-  - Resume
-  - 报考
-  - 理解 transformer
-  - 
+  - c++ code
+  - paddleocr 推理+微调  
+  - fastdeploy cls det ocr 推理
+  - openvino cls objdet
+  - TensorRT cls objdet
+  - opencv 
+  - EfficientNet B0~B7
+  - paddle mobilenetv3
+
+- 0212
+  - PaddleX  LCNet  MobileNet
+  - FastDeploy  cls  OpenVINO  TensorRT
+  - PaddleX OCR
+  - FastDeploy OCR
