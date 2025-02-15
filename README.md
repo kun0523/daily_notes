@@ -101,3 +101,13 @@ take notes about coding
   - 推理
     - OpenVINO
     - TensorRT
+
+
+- 0215
+  - tensorrt cls det **seg**
+  - tensorrt **linux**
+  - **dbnet crnn kie**
+  - ppocr 微调
+  - openvino
+
+

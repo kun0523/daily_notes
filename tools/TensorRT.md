@@ -16,7 +16,7 @@
 - CUDA 11.8、cuDNN 8.9.0、TensorRT 8.6.1：适用于30系卡  自测试OK
 - https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/support-matrix.html
 - 
-## 安装
+## Windows安装
 
 1. 安装 CUDA： 下载并运行 NVIDIA 提供的 CUDA 安装程序，按照提示进行安装.
 2. 安装 cuDNN： 下载 cuDNN 压缩包，解压后将文件复制到 CUDA 安装目录下的对应位置。例如，将 include 目录中的文件复制到 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include，将 lib64 目录中的文件复制到 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\lib\x64.
@@ -38,6 +38,16 @@
 - 下载：https://developer.nvidia.com/tensorrt
 - 配置：将bin目录配置到环境变量中
 - 测试：`trtexec --version`
+- EA & GA
+  - **EA** Early Access  早期测试阶段 **用于测试新特性**
+  - **GA** General Availability  全面测试和验证  **用于部署**
+
+## Linux 安装
+- `TensorRT 8.6 GA for Linux x86_64 and CUDA 11.0, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7 and 11.8 TAR Package `  下载tar package
+- 下载 `wget "https://developer.nvidia.com/downloads/compute/machine-learning/tensorrt/secure/8.6.1/tars/TensorRT-8.6.1.6.Linux.x86_64-gnu.cuda-11.8.tar.gz"`  因为带有特殊符号，所以要用引号
+- `wget "https://developer.nvidia.com/downloads/compute/cudnn/secure/8.9.0/local_installers/11.8/cudnn-linux-x86_64-8.9.0.131_cuda11-archive.tar.xz"`
+- 加入环境变量
+
 
 ### 测试代码
 
@@ -178,8 +188,8 @@ int main()
     char* trtModelStream = nullptr;
     int size = 0;
     if (file.good()) {
-        file.seekg(0, file.end);
-        size = file.tellg();
+        file.seekg(0, file.end);  // seekg（std::streamoff, std::ios_base::seekdir） 将位置指针相对于 seekdir 偏移 streamoff
+        size = file.tellg();  // tellg() 获取指针当前位置
         file.seekg(0, file.beg);
         trtModelStream = new char[size];
         assert(trtModelStream);
@@ -489,6 +499,118 @@ int main()
     return 0;
 
 
+}
+```
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <opencv2/opencv.hpp>
+#include <NvInfer.h>
+
+using namespace nvinfer1;
+using namespace cv;
+
+namespace det_task {
+	class Logger : public ILogger {
+		void log(Severity severity, const char* msg) noexcept {
+			if (severity != Severity::kINFO)
+				std::cout << msg << std::endl;
+		}
+	}mLogger;
+}
+
+int main() {
+	// 读取模型
+	std::string model_pth = R"(D:\le_trt\models\yolov8s.engine)";
+
+	std::ifstream file(model_pth, std::ios::binary);
+	char* trtModelStream = nullptr;
+	size_t model_size{};
+	if (file.good()) {
+		file.seekg(0, file.end);
+		model_size = file.tellg();
+		file.seekg(0, file.beg);
+
+		trtModelStream = new char[model_size];
+		file.read(trtModelStream, model_size);
+		file.close();
+	}
+	std::cout << "Model size: " << model_size << std::endl;
+
+	auto runtime = createInferRuntime(det_task::mLogger);
+	auto engine = runtime->deserializeCudaEngine(trtModelStream, model_size);
+	auto context = engine->createExecutionContext();
+	delete[] trtModelStream;
+
+	int input_index = engine->getBindingIndex("images");
+	int input_h = engine->getBindingDimensions(input_index).d[2];
+	int input_w = engine->getBindingDimensions(input_index).d[3];
+
+	int output_index = engine->getBindingIndex("output0");
+	int output_h = engine->getBindingDimensions(output_index).d[1];
+	int output_w = engine->getBindingDimensions(output_index).d[2];
+
+	void* buffers[2] = { nullptr, nullptr };
+	cudaMalloc(&buffers[input_index], input_h * input_w * 3 * sizeof(float));
+	cudaMalloc(&buffers[output_index], output_h * output_w * sizeof(float));
+
+	// 读取图片 与 前处理
+	cv::Mat image = cv::imread(R"(D:\le_trt\test_images\person.jpg)");
+	cv::Mat tensor = cv::dnn::blobFromImage(image, 1 / 255.0, cv::Size(input_w, input_h), cv::Scalar(), true);
+
+	float scale_x = (float)image.cols / (float)input_w;
+	float scale_y = (float)image.rows / (float)input_h;
+
+	cudaStream_t stream;
+	cudaStreamCreate(&stream);
+	cudaMemcpyAsync(buffers[input_index], tensor.ptr<float>(), input_h * input_w * 3 * sizeof(float), cudaMemcpyHostToDevice, stream);
+
+	// 推理
+	context->enqueueV2(buffers, stream, nullptr);
+
+	std::vector<float> prob;
+	prob.resize(output_h * output_w);
+	cudaMemcpyAsync(prob.data(), buffers[output_index], output_h * output_w * sizeof(float), cudaMemcpyDeviceToHost, stream);
+
+	// 后处理与显示
+	cv::Mat probMat(output_h, output_w, CV_32F, (float*)prob.data());
+	probMat = probMat.t();
+
+	std::vector<float> scores;
+	std::vector<cv::Rect> bboxes;
+	std::vector<int> bbox_indexes;
+	for (int i{}; i < probMat.rows; i++) {
+		cv::Mat row = probMat.row(i);
+		cv::Mat s = row.colRange(4, probMat.cols);
+
+		cv::Point maxL;
+		double maxv;
+		cv::minMaxLoc(s, 0, &maxv, 0, &maxL);
+		if (maxv > 0.5) {
+
+			int cx = static_cast<int>(row.at<float>(0) * scale_x);
+			int cy = static_cast<int>(row.at<float>(1) * scale_y);
+			int ow = static_cast<int>(row.at<float>(2) * scale_x);
+			int oh = static_cast<int>(row.at<float>(3) * scale_y);
+
+			std::cout << "score: " << maxv << " | " <<  cx << " " << cy << " " << ow << " " << oh << std::endl;
+
+			bboxes.emplace_back(cx - ow / 2, cy - oh / 2, ow, oh);		
+			scores.emplace_back(maxv);
+		}
+	}
+
+	cv::dnn::NMSBoxes(bboxes, scores, 0.5, 0.5, bbox_indexes);
+
+	for (auto i : bbox_indexes) {
+		cv::Rect r = bboxes[i];
+
+		cv::rectangle(image, r, cv::Scalar(0, 0, 255), 3);
+	}
+
+	cv::imshow("show", image);
+	cv::waitKey(0);
 }
 ```
 

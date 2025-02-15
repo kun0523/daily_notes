@@ -1,3 +1,19 @@
+# DeepSeek
+
+- 大模型的能力分级
+  - ![大语言模型能力划分](../image_resources/AI_stages.png)
+- 机器学习、深度学习、大模型基础模型、推理模型
+  - ![](../image_resources/ml_llm.png)
+- 基座大模型与推理大模型
+  - ![](../image_resources/basemodel_reasoningmodel.png)
+- 稠密大模型与MoE大模型
+  - ![](../image_resources/densemodel_MoEmodel.png)
+- 参数量与显存需求
+  - ![](../image_resources/params_RAM.png)
+- 蒸馏
+  - ![](../image_resources/exp_distill.png)
+
+
 # Ollama
 
 ## 环境搭建
