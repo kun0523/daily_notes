@@ -47,7 +47,32 @@
 - 下载 `wget "https://developer.nvidia.com/downloads/compute/machine-learning/tensorrt/secure/8.6.1/tars/TensorRT-8.6.1.6.Linux.x86_64-gnu.cuda-11.8.tar.gz"`  因为带有特殊符号，所以要用引号
 - `wget "https://developer.nvidia.com/downloads/compute/cudnn/secure/8.9.0/local_installers/11.8/cudnn-linux-x86_64-8.9.0.131_cuda11-archive.tar.xz"`
 - 加入环境变量
+    - `export PATH=path/to/TensorRT/bin:$PATH` 将 trtexec 工具加入到环境变量中
+    - `export LD_LIBRARY_PATH=path/to/TensorRT/lib:path/to/CUDA/lib:$LD_LIBRARY_PATH` 将 CUDA TensorRT 的库加入到环境变量中 便于后续链接
 
+- OpenCV 安装
+    - `apt update; apt install libopencv-dev`
+
+- 安装 miniconda
+    - `wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh`
+    - `bash Miniconda3-latest-Linux-x86_64.sh`
+
+- CmakeLists 文件
+    - ```cmake
+        cmake_minimum_required(VERSION 3.13)
+        project(TRT_TEST)
+
+        find_package(OpenCV REQUIRED)
+        find_package(CUDA REQUIRED)
+
+        include_directories("/root/le_trt/TensorRT-8.6.1.6/include")
+        link_directories("/root/le_trt/TensorRT-8.6.1.6/lib")
+
+        add_executable(${PROJECT_NAME} main.cc)
+        target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+        target_include_directories(${PROJECT_NAME} PRIVATE ${CUDA_INCLUDE_DIRS})
+        target_link_libraries(${PROJECT_NAME} nvinfer)
+      ```
 
 ### 测试代码
 

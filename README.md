@@ -75,7 +75,7 @@ take notes about coding
       - Anchor Free: 解耦头 Decoupled Head 设计 将分类任务和回归任务分离，使用独立分支处理不同任务
       - C2f：包含一个Split和多个BottleNect（就是2层3x3卷积），将特征图沿channel分成两部分，一部分走BottleNect，另一部分直接连输出，两部分拼接后输出
 
-      - 
+  
   - yolo11
     - 算法细节：
       - C3k2 继承于 C2f 仅改变 BottleNeck的方式
@@ -110,4 +110,49 @@ take notes about coding
   - ppocr 微调
   - openvino
 
+- KIE
+  - key information extraction 从文本或图像中提取结构化关键信息的技术
+  - SER 语义实体识别：对文本进行分类标注 
+  - RE  关系抽取：建立实体间的关联
+
+- 大模型 LLM
+  
+
+- TensorRT  rtx 2060 cls   det 20ms  seg  推理 + 延时统计 （1h）
+  - rtx 2060 yolo11n engine fp16
+    - cls  4.2 GFlops/112 layers/ 9.5 MB / 7ms
+    - det  6.5 GFlops/238 layers / 7.8 MB / 25 ms
+    - seg  10.4 GFlops/265 layers/ 8.6 MB / 
+  - rtx 2060 yolo11s engine fp16
+    - cls   GFlops/112 layers/  MB / ms
+    - det   GFlops/238 layers / MB / ms
+    - seg   GFlops/265 layers/ 
+    - 
+- OpenVINO  cls  det  seg  推理 + 延时统计 （1h）
+  - i7-10 yolo11n onnx fp16
+    - cls  4.2 GFlops/112 layers/ 10 MB / 10ms
+    - det  6.5 GFlops/238 layers / 10 MB / 60ms
+    - seg  10.4 GFlops/265 layers/ 11 MB / 
+  - 
+- TensorRT 量化
+- OCR
+  - DBNet
+  - CRNN + CTC Loss
+  - fastdeploy ocr fps ... TODO...
+- OpenCV 主要算法
+  - 对比度增强  平衡直方图
+  - 直方图
+  - Contual 轮廓
+  - 二值化
+
+- 需要熟练掌握的：
+  - 模型训练:cls  det(track)  seg  pose  
+  - 模型部署:ONNX OpenVINO TensorRT
+  - OCR微调
+  - OpenCV传统算法
+
+- 0218
+  - seg
+  - TensorRT 量化
+  - Swin-Transformer
 
