@@ -31,16 +31,6 @@ take notes about coding
   - RAG
   - DeepSeek 算法思想
 
-- 0212
-  - ~~PaddleX  LCNet  MobileNet~~
-  - ~~FastDeploy  cls  OpenVINO~~
-  
-- 0213
-  - ~~RapidOCR~~
-  - PaddleX OCR
-  - ~~FastDeploy OCR~~
-  - TensorRT 配置
-  - 机器学习在工业上的应用 预测性的维护，智能排程？
 
 - 集成算法：
   - Boosting
@@ -103,20 +93,10 @@ take notes about coding
     - TensorRT
 
 
-- 0215
-  - tensorrt cls det **seg**
-  - tensorrt **linux**
-  - **dbnet crnn kie**
-  - ppocr 微调
-  - openvino
-
 - KIE
   - key information extraction 从文本或图像中提取结构化关键信息的技术
   - SER 语义实体识别：对文本进行分类标注 
   - RE  关系抽取：建立实体间的关联
-
-- 大模型 LLM
-  
 
 - TensorRT  rtx 2060 cls   det 20ms  seg  推理 + 延时统计 （1h）
   - rtx 2060 yolo11n engine fp16
@@ -147,12 +127,16 @@ take notes about coding
 
 - 需要熟练掌握的：
   - 模型训练:cls  det(track)  seg  pose  
+    - YOLO 完整的训练过程  图像前处理
+    - ViT  Swin-Transformer
   - 模型部署:ONNX OpenVINO TensorRT
+    - OpenVINO 量化
+    - TensorRT 量化
   - OCR微调
+    - 训练过程
+    - OCR是怎么识别出一个序列的？？
   - OpenCV传统算法
-
-- 0218
-  - seg
-  - TensorRT 量化
-  - Swin-Transformer
+    - 
+  - Qwen2.5-vl  做 图片理解 ocr  目标检测  
+    - 怎么做LoRA微调！！！
 
