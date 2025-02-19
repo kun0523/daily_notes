@@ -147,17 +147,18 @@ take notes about coding
 
 - 需要熟练掌握的：
   - 模型训练:cls  det(track)  seg  pose  
+    - YOLO 完整的训练过程  图像前处理
+    - ViT  Swin-Transformer
   - 模型部署:ONNX OpenVINO TensorRT
+    - OpenVINO 量化
+    - TensorRT 量化
   - OCR微调
+    - 训练过程
+    - OCR是怎么识别出一个序列的？？
   - OpenCV传统算法
-
-- 0218
-  - ~~seg~~
-  - ~~TensorRT 量化~~
-  - Swin-Transformer
-  - P2PNet
-  - deepseek + 知识库 
-  - 对卷积的理解
+    - 
+  - Qwen2.5-vl  做 图片理解 ocr  目标检测  
+    - 怎么做LoRA微调！！！
 
 - 数据、流量、场景、数据分析
 - 解决问题，分析数据，使用大模型训练行业垂类模型
