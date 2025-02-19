@@ -641,3 +641,285 @@ int main() {
 
 
 ## 分割任务实例代码
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <chrono>
+#include <opencv2/opencv.hpp>
+#include <NvInfer.h>
+
+namespace seg_task {
+
+    using namespace nvinfer1;
+    using namespace cv;
+
+    // 必须要定义， 创建 IBuilder  IRuntime 时要用
+    class Logger : public ILogger {
+        void log(Severity severity, const char* msg) noexcept {
+            if (severity != Severity::kINFO)  // 出错时打印
+                std::cout << msg << std::endl;
+        }
+    }gLogger;
+
+    // 解析类别标签
+    std::string labels_txt_file = R"(E:\le_trt\models\coco_classes.txt)";
+    std::vector<std::string> readClassName() {
+        std::vector<std::string> classNames;
+
+        std::ifstream fp(labels_txt_file);
+        if (!fp.is_open()) {
+            printf("Could not open file...\n");
+            exit(-1);
+        }
+        std::string name;
+        while (!fp.eof()) {
+            std::getline(fp, name);
+            if (name.length())
+                classNames.push_back(name);
+        }
+        fp.close();
+        return classNames;
+    }
+
+    float sigmoid_function(float v) {
+        float b = 1. / (1. + exp(-v));
+        return b;
+    }
+
+}
+int main()
+{
+    std::vector<std::string> labels = seg_task::readClassName();
+    std::string enginepath = R"(E:\le_trt\models\yolov8-seg.engine)";
+    std::ifstream file(enginepath, std::ios::binary);
+    char* trtModelStream = nullptr;
+    int size = 0;
+    if (file.good()) {
+        file.seekg(0, file.end);
+        size = file.tellg();
+        file.seekg(0, file.beg);
+        trtModelStream = new char[size];
+        assert(trtModelStream);
+        file.read(trtModelStream, size);
+        file.close();
+    }
+
+    auto runtime = seg_task::createInferRuntime(seg_task::gLogger);
+    assert(runtime != nullptr);
+    auto engine = runtime->deserializeCudaEngine(trtModelStream, size);
+    assert(engine != nullptr);
+    auto context = engine->createExecutionContext();
+    assert(context != nullptr);
+    delete[] trtModelStream;
+
+    void* buffers[3] = { NULL, NULL, NULL };
+    std::vector<float> prob;
+    std::vector<float> mprob;
+    cudaStream_t stream;
+
+    int input_index = engine->getBindingIndex("images");  // 0
+    int output_index = engine->getBindingIndex("output0");  // 1
+    int mask_index = engine->getBindingIndex("output1");  // 1
+    std::cout << "input_index: " << input_index << " output_index: " << output_index << " mask_index: " << mask_index << std::endl;
+
+    // 获取输入维度信息 NCHW 1x3x640x640
+    int input_h = engine->getBindingDimensions(input_index).d[2];
+    int input_w = engine->getBindingDimensions(input_index).d[3];
+    std::cout << "inputH: " << input_h << " inputW:" << input_w << std::endl;
+
+    // 获取输出维度信息 116x8400  (4+80+32)x8400
+    int output_h = engine->getBindingDimensions(output_index).d[1];
+    int output_w = engine->getBindingDimensions(output_index).d[2];
+    std::cout << "output data format: " << output_h << "x" << output_w << std::endl;
+
+    // 获取输出维度信息 32x160x160
+    int mask_c = engine->getBindingDimensions(mask_index).d[1];
+    int mask_h = engine->getBindingDimensions(mask_index).d[2];
+    int mask_w = engine->getBindingDimensions(mask_index).d[3];
+    std::cout << "output data format: " << mask_c << "x" << mask_h << "x" << mask_w << std::endl;
+
+    // 创建GPU显存输入 输出缓冲区
+    std::cout << "input/output : " << engine->getNbBindings() << std::endl; // get the number of binding indices
+    cudaMalloc(&buffers[input_index], input_h * input_w * 3 * sizeof(float));
+    cudaMalloc(&buffers[output_index], output_h * output_w * sizeof(float));
+    cudaMalloc(&buffers[mask_index], mask_c * mask_h * mask_w * sizeof(float));
+
+    // 创建零食缓存输出
+    prob.resize(output_h * output_w);
+    mprob.resize(mask_c * mask_h * mask_w);
+    float sx = 160.f / 640.f;
+    float sy = 160.f / 640.f;
+
+    // 创建cuda流
+    cudaStreamCreate(&stream);
+
+    float score_threshold = 0.1;
+    // 第一次推理12ms，后续的推理3ms左右
+    for (int i = 0; i < 10; i++) {
+        auto start = std::chrono::high_resolution_clock::now();
+
+        cv::Mat image = cv::imread(R"(E:\le_trt\models\cat-dog.png)");
+        //cv::Mat rgb, blob;
+        //cv::cvtColor(image, rgb, cv::COLOR_BGR2RGB);
+        //cv::resize(rgb, blob, cv::Size(input_w, input_h));
+        //blob.convertTo(blob, CV_32F);
+        //blob = blob / 255.0;
+        //cv::subtract(blob, cv::Scalar(0.485, 0.456, 0.406), blob);
+        //cv::divide(blob, cv::Scalar(0.229, 0.224, 0.225), blob);
+        int w = image.cols;
+        int h = image.rows;
+        int _max = std::max(h, w);
+        cv::Mat tmp = cv::Mat::zeros(cv::Size(_max, _max), CV_8UC3);
+        cv::Rect roi(0, 0, w, h);
+        image.copyTo(tmp(roi));
+        cv::Mat tensor = cv::dnn::blobFromImage(tmp, 1.0f / 255.0f, cv::Size(input_w, input_h), cv::Scalar(), true);
+
+        float x_factor = (float)tmp.cols / input_w;
+        float y_factor = (float)tmp.rows / input_h;
+
+        // 内存到GPU显存
+        cudaMemcpyAsync(buffers[0], tensor.ptr<float>(), input_h * input_w * 3 * sizeof(float), cudaMemcpyHostToDevice, stream);
+
+        // 推理
+        context->enqueueV2(buffers, stream, nullptr);
+
+        // GPU显存到内存
+        cudaMemcpyAsync(prob.data(), buffers[output_index], output_h * output_w * sizeof(float), cudaMemcpyDeviceToHost, stream);
+        cudaMemcpyAsync(mprob.data(), buffers[mask_index], mask_c * mask_h * mask_w * sizeof(float), cudaMemcpyDeviceToHost, stream);
+
+        // 后处理
+        std::vector<cv::Rect> boxes;
+        std::vector<int> classIds;
+        std::vector<float> confidences;
+        std::vector<cv::Mat> masks;
+        cv::Mat probmat(output_h, output_w, CV_32F, (float*)prob.data());
+        cv::Mat proto_mask(mask_c, mask_h * mask_w, CV_32F, (float*)mprob.data()); 
+        cv::Mat res = probmat.t();
+        std::cout << res.size << std::endl;
+        for (int i{}; i < res.rows; i++) {
+            cv::Mat classes_scores = res.row(i).colRange(4, output_h-mask_c);
+            cv::Point classIdPoint;
+            double score;
+            cv::minMaxLoc(classes_scores, 0, &score, 0, &classIdPoint);
+
+            if (score > score_threshold) {
+                float cx = res.at<float>(i, 0);
+                float cy = res.at<float>(i, 1);
+                float ow = res.at<float>(i, 2);
+                float oh = res.at<float>(i, 3);
+
+                int x = static_cast<int>((cx - 0.5 * ow) * x_factor);
+                int y = static_cast<int>((cy - 0.5 * oh) * y_factor);
+                int width = static_cast<int>(ow * x_factor);
+                int height = static_cast<int>(oh * y_factor);
+                cv::Rect box;
+                box.x = x;
+                box.y = y;
+                box.width = width;
+                box.height = height;
+
+                cv::Mat mask2 = res.row(i).colRange(output_h - mask_c, output_h);
+                masks.push_back(mask2);
+                boxes.push_back(box);
+                classIds.push_back(classIdPoint.x);
+                confidences.push_back(score);
+            }
+        }
+        std::cout << "Detect box num: " << boxes.size() << std::endl;
+        cv::RNG rng;
+
+        // NMS
+        std::vector<int> indexes;
+        cv::dnn::NMSBoxes(boxes, confidences, 0.5, 0.5, indexes);
+
+        // 处理 SegMask
+        cv::Mat rgb_mask = cv::Mat::zeros(image.size(), image.type());
+        for (size_t i{}; i < indexes.size(); i++) {
+            int index = indexes[i];
+            int idx = classIds[index];
+            float conf = confidences[index];
+            cv::Rect box = boxes[index];  // 原图中的检测框
+            int x1 = std::max(0, box.x);
+            int y1 = std::max(0, box.y);
+            int x2 = std::max(0, box.br().x);
+            int y2 = std::max(0, box.br().y);
+            //std::cout << "x1: " << x1 << " x2: " << x2 << " y1: " << y1 << " y2: " << y2 << std::endl;
+
+            cv::Mat m2 = masks[index];  // 掩膜系数 1x32 每一个检测框都有一个mask的向量  为什么是32？？  32个掩膜的系数，与另一个矩阵结合形成掩膜
+            cv::Mat m = m2 * proto_mask;  //  形状 1x32 * 32x(160*160) 掩膜 1x(160*160)
+            std::cout << "shape of m2*maks1: " << m.size << std::endl;
+            for (int col{}; col < m.cols; col++) {
+                m.at<float>(0, col) = seg_task::sigmoid_function(m.at<float>(0, col));  // 转成0~1？？？
+            }
+            cv::Mat m1 = m.reshape(1, 160);  // 指定 通道数 和 行数  列数自行推导  m1 160x160 当前检测框对应的mask
+            std::cout << "shape of m.reshape(1,160): " << m1.size << std::endl;
+            int mx1 = std::max(0, int(x1 / x_factor * sx));  // 从原图bbox 转变为 160特征图bbox
+            int mx2 = std::max(0, int(x2 / x_factor * sx));
+            int my1 = std::max(0, int(y1 / y_factor * sy));
+            int my2 = std::max(0, int(y2 / y_factor * sy));
+            cv::Mat mask_roi = m1(cv::Range(my1, my2), cv::Range(mx1, mx2));
+            cv::Mat rm, det_mask;
+            std::cout << "mask_roi shape: " << mask_roi.size << std::endl;
+            cv::resize(mask_roi, rm, cv::Size(x2 - x1, y2 - y1)); // 将检测框中的mask resize 回到原图尺寸
+            std::cout << "rm shape: " << rm.size << std::endl;
+            for (int r = 0; r < rm.rows; r++) {
+                for (int c = 0; c < rm.cols; c++) {
+                    float pv = rm.at<float>(r, c);
+                    if (pv > 0.5) {
+                        rm.at<float>(r, c) = 1.0;
+                    }
+                    else {
+                        rm.at<float>(r, c) = 0.0;
+                    }
+                }
+            }
+            rm = rm * rng.uniform(0, 255);
+            rm.convertTo(det_mask, CV_8UC1);
+            if ((y1 + det_mask.rows) >= image.rows) {
+                y2 = image.rows - 1;
+            }
+            if ((x1 + det_mask.cols) >= image.cols) {
+                x2 = image.cols - 1;
+            }
+            cv::Mat mask = cv::Mat::zeros(cv::Size(image.cols, image.rows), CV_8UC1);
+            det_mask(cv::Range(0, y2 - y1), cv::Range(0, x2 - x1)).copyTo(mask(cv::Range(y1, y2), cv::Range(x1, x2)));
+            add(rgb_mask, cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255)), rgb_mask, mask);
+
+            cv::rectangle(image, boxes[index], cv::Scalar(0, 0, 255), 1, 8);
+            //cv::rectangle(image, cv::Point(boxes[index].tl().x, boxes[index].tl().y - 20),
+                //cv::Point(boxes[index].br().x, boxes[index].tl().y), cv::Scalar(0, 255, 255), -1);
+        }
+
+        auto stop = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> spend = stop - start;
+        std::cout << "Iter: " << i << " Inference cost: " << spend.count() << "ms" << std::endl;
+
+        //cv::addWeighted(image, 0.6, rgb_mask, 0.4, 0, image);
+        //cv::imshow("test", image);
+        //cv::waitKey();   
+    }
+
+    // 同步结束 释放资源
+    cudaStreamSynchronize(stream);
+    cudaStreamDestroy(stream);
+
+    if (!context) {
+        context->destroy();
+    }
+    if (!engine) {
+        engine->destroy();
+    }
+    if (!runtime) {
+        runtime->destroy();
+    }
+    if (!buffers[0]) {
+        delete[] buffers;
+    }
+
+    std::cout << "Job Done" << std::endl;
+
+    return 0;
+}
+
+```

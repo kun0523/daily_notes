@@ -123,10 +123,10 @@ take notes about coding
     - cls  4.2 GFlops/112 layers/ 9.5 MB / 7ms
     - det  6.5 GFlops/238 layers / 7.8 MB / 25 ms
     - seg  10.4 GFlops/265 layers/ 8.6 MB / 
-  - rtx 2060 yolo11s engine fp16
+  - rtx 3060 yolo11s engine fp16
     - cls   GFlops/112 layers/  MB / ms
     - det   GFlops/238 layers / MB / ms
-    - seg   GFlops/265 layers/ 
+    - seg   GFlops/265 layers/ MB / 25ms
     - 
 - OpenVINO  cls  det  seg  推理 + 延时统计 （1h）
   - i7-10 yolo11n onnx fp16
@@ -152,7 +152,20 @@ take notes about coding
   - OpenCV传统算法
 
 - 0218
-  - seg
-  - TensorRT 量化
+  - ~~seg~~
+  - ~~TensorRT 量化~~
   - Swin-Transformer
+  - P2PNet
+  - deepseek + 知识库 
+  - 对卷积的理解
 
+- 数据、流量、场景、数据分析
+- 解决问题，分析数据，使用大模型训练行业垂类模型
+
+
+- 项目中主要困难点：
+  1. 异常数据占比低
+  2. 小目标检测
+  3. 密集目标检测
+  4. 对象跟踪
+  5. 动作识别
