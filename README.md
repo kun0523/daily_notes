@@ -170,3 +170,25 @@ take notes about coding
   3. 密集目标检测
   4. 对象跟踪
   5. 动作识别
+
+- 问题：
+  1. 对象跟踪，是不是只能基于目标检测？
+  2. 密集目标怎么做跟踪
+  3. 动作识别的原理
+  4. huggingface的使用 diffuser tranformers pytorch-models
+  5. P2PNet 密集计数
+
+1. 复现经典骨干网络 -- 熟悉经典网络的数据流、pytorch搭建过程
+2. 复现经典下游任务 目标检测  计数  跟踪
+3. 大模型算法思想
+4. 大模型微调
+5. 视觉大模型应用
+
+- TODO：
+  - 手搭 Mobile net ！！！
+  - 手搭 Transformer
+  - 手搭 Vit  ！！！
+  - 手搭 Swin-Transformer
+  - 复现 P2PNet
+  - LoRA微调
+
