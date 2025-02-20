@@ -192,3 +192,13 @@ take notes about coding
   - 复现 P2PNet
   - LoRA微调
 
+- 0220
+  - **填表格**
+  - ViT
+  - Swin-Transformer
+  - ~~MobileNet V1 V2~~
+  - MobileNet V3 V4
+  - yolo
+  - Qwen-VL-7b-instructed for dent det
+  - cherrystudio + ollama
+
