@@ -156,3 +156,106 @@
 
 ## 量化
 
+
+# Qwen2.5-VL
+
+- 下载HuggingFace上的模型
+  - `huggingface-cli download Qwen/Qwen2.5-VL-3B-Instruct --local-dir ../qwen25vl/`  
+- vllm
+  - 用于推理大模型
+  - 不能在windows上运行
+
+## 使用docker
+- `docker pull nvidia/cuda:12.2.2-runtime-ubuntu22.04`  拉取相应的镜像
+- `docker run --gpus=all -it --name vllm -p 8010:8000 -v D:\le_qwen\models:/llm-model  nvidia/cuda:12.2.2-runtime-ubuntu22.04`  启动容器
+- `apt update -yq --fix-missing` 更新apt软件库， -y yes -q quiet 
+- `apt install -yq --no-install-recommends pkg-config wget cmake curl git vim`
+- `wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh`
+- `sh Miniconda3-latest-Linux-x86_64.sh -b -u -p ~/miniconda3`
+- `~/miniconda3/bin/conda init`
+- `source ~/.bashrc`  安装好miniconda环境
+- `conda create -n qwen python=3.11 -y`  qwen虚拟环境
+- `pip install vllm`  使用vllm 下载模型并推理
+- `pip install git+https://github.com/huggingface/transformers`
+- `export HF_HOME=/llm-model`
+- `vllm serve Qwen/Qwen2.5-VL-3B-Instruct --limit-mm-per-prompt image=4`
+
+## 直接python加载模型推理
+- huggingface-cli 下载模型
+- 加载离线模型
+```python
+from transformers import AutoModelForImageTextToText, AutoProcessor
+from qwen_vl_utils import process_vision_info
+import torch
+
+
+# 加载模型与处理器
+model = AutoModelForImageTextToText.from_pretrained(
+    "./models/",  # 指定模型路径
+    torch_dtype=torch.bfloat16,  # 推荐使用 bfloat16 节省显存[4,5](@ref)
+    device_map="auto"            # 自动分配 GPU/CPU 资源
+)
+processor = AutoProcessor.from_pretrained("./models/")
+
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {"type": "image", "image": "./test_images/OIP-C.jpg"},
+            {"type": "text", "text": "detect little girl in this picture, return boundingbox as {'obj':'girl', 'position':[top_left_x, top_left_y, bottom_right_x, bottom_right_y]}"}
+        ]
+    }
+]
+
+# 处理图像/视频输入
+image_inputs, video_inputs = process_vision_info(messages)
+
+# 生成模型输入格式
+text = processor.apply_chat_template(
+    messages,
+    tokenize=False,
+    add_generation_prompt=True
+)
+inputs = processor(
+    text=[text],
+    images=image_inputs,
+    videos=video_inputs,
+    padding=True,
+    return_tensors="pt"
+).to("cuda")
+
+# 生成响应（推荐参数配置）
+generated_ids = model.generate(
+    **inputs,
+    max_new_tokens=2048,          # 控制生成文本长度[4,7](@ref)
+    do_sample=True,               # 启用随机采样
+    top_p=0.9,                    # 核采样概率阈值
+    temperature=0.7,              # 控制生成随机性
+    repetition_penalty=1.1        # 减少重复生成
+)
+
+# 解码输出
+generated_ids_trimmed = [
+    out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+]
+output_text = processor.batch_decode(
+    generated_ids_trimmed,
+    skip_special_tokens=True,
+    clean_up_tokenization_spaces=False
+)
+print(output_text[0])
+```
+
+## 使用Ollama部署Qwen2.5-VL  视觉VL模型不支持 GGUF 转换！！！
+- 下载模型文件
+  - `huggingface-cli download Qwen/Qwen2.5-VL-3B-Instruct --local-dir path/to/save`
+- 转换成`GGUF`格式
+  - 使用 `llama.cpp` 库 
+    - `git clone https://github.com/ggml-org/llama.cpp.git`
+    - `pip install -r requirements/requirements-convert_hf_to_gguf.txt`
+    - `cmake -B build` 
+    - `cmake --build build --config Release` 生成工具
+    - 转换为 `gguf` 格式    
+    - 模型量化  
+- 创建 Ollama模型
+- 推理测试
