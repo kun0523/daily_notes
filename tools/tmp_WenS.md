@@ -165,6 +165,14 @@
   - 用于推理大模型
   - 不能在windows上运行
 
+## 量化
+- AWQ Activation-aware Weight Quantization 
+
+## 使用官方API
+
+## 使用本地部署 - HuggingFace
+- 
+
 ## 使用docker
 - `docker pull nvidia/cuda:12.2.2-runtime-ubuntu22.04`  拉取相应的镜像
 - `docker run --gpus=all -it --name vllm -p 8010:8000 -v D:\le_qwen\models:/llm-model  nvidia/cuda:12.2.2-runtime-ubuntu22.04`  启动容器
@@ -259,3 +267,42 @@ print(output_text[0])
     - 模型量化  
 - 创建 Ollama模型
 - 推理测试
+
+- 场景挖掘： 
+- 算法工程落地  openvino  tensorrt  量化  
+
+- python C++ code
+- self-intro：视觉任务，数据增强辅助训练，模型优化，模型部署，大模型应用
+- questions 
+1. 模型结构的改动
+   - 背景复杂，导致误检：通道注意力机制
+   - 对象小：加大特征图分辨率
+   - yolov10 注意力
+   - yolov11 注意力
+   - yolov12 注意力
+   - 加小规模的注意力机制是趋势
+   - 
+2. 模型轻量化
+   - 蒸馏（大模型标注数据，用于小模型训练）
+   - ~~剪枝~~
+   - 量化  (模型本身很小的时候量化反而变慢)
+   - 
+3. 部署工程化  yolo11s  100layers  20GFLOPs
+   - python    cpu  640  det  yolo11s 18MB    120ms
+     - 大致流程：
+   - OpenVINO  cpu  640  det  yolo11s 36MB    80ms
+     - 大致流程：
+   - TensorRT  3060  640  det  yolo11s 22MB   10ms
+     - 大致流程：反序列化模型创建engine >> 根据输入输出尺寸创建CUDA缓冲区域 >> 将数据同步到CUDA后进行推理 >> 将推理结果从CUDA中取出做后处理
+   - 
+4. 大模型使用
+   - RTX 3090（24G） 部署 ollama deepseek R1 14b 配合 cherry studio 做本地知识库
+   - Qwen2.5 7b ubuntu huggingface transformers 可以根据prompt做目标检测和OCR
+   - RAG 知识库
+     - nomic-embed-text
+     - langchain 做文本抽取，组件向量
+
+5. 常用指标理解：
+   - Recall
+   - Precision
+   - mAP
