@@ -287,7 +287,7 @@ print(output_text[0])
    - ~~剪枝~~
    - 量化  (模型本身很小的时候量化反而变慢)
    - 
-3. 部署工程化  yolo11s  100layers  20GFLOPs
+3. 部署工程化  yolo11s  100layers  20GFLOPs  （yolo11m  200layers   yolo11l 300layers）
    - python    cpu  640  det  yolo11s 18MB    120ms
      - 大致流程：
    - OpenVINO  cpu  640  det  yolo11s 36MB    80ms
@@ -306,3 +306,52 @@ print(output_text[0])
    - Recall
    - Precision
    - mAP
+
+6. ultralytics不同任务的训练方式：
+   - 分类：
+     - scales [depth(网络层数), width(中间特征图通道数), max_channels(限制最大的通道数)]
+       - depth == e： 控制中间特征图的维度数
+       - 
+
+- 模块解释
+
+- Conv
+  - act(bn(conv2d))
+  - 没有做残差连接
+
+- Bottleneck
+  - 两次卷积 + 恒等映射(如何卷积后的通道数==原始特征图的通道数)
+  - 第二次卷积可以做分组卷积，即实现深度可分离卷积 (group_num = input_channel_num)
+
+- SPP
+  - 3个MaxPool堆叠（kernel=5,9,13，特征图尺寸不变，仅改变特征图感受野）  
+  - 分别计算3个Kernel的MaxPooling
+  - 相当于在通道维度上，拼接不同感受野的特征图，最后再做一次卷积，融合信息
+  - 
+- SPPF
+  - 3个MaxPool堆叠，KernelSize只有一种 5，不改变特征图大小；
+  - 依次计算3个k=5的MaxPooling，
+  - 最后在通道维度上拼接，再做依次卷积
+
+- CSP
+  - Cross Stage Partial Net  跨阶段的局部网络
+  - 对特征图，在通道维度上切分，分别进行不同的卷积网络，最后做特征融合
+  - torch.tensor.chunk(chunks_num, dim)  对tensor的指定维度上，切分成 chunks_num 份  
+
+
+- Attention
+  - 进入之前已经压缩成  BxNx1x1 的形状   前面已经压成一维了吗？？？
+  - qkv  1x1 卷积  >> B x HeadNum x （k_dim+q_dim+head_dim） x N
+  - attn = softmax(q@k*scale)   ???? 为什么最后都变成一维了？？对head的权重？？待确认
+  - V@attn
+
+- PSABlock
+  - Attention模块提取特征
+  - FFN feed-forward 融合特征
+  - 
+
+- A2C2f
+  - Area-Attention  ?????
+  - 
+
+- SE 
