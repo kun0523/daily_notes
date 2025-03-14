@@ -373,3 +373,16 @@ print(output_text[0])
   - 动物的数据 + 养户的数据 （越早开始越有优势）（选取核心指标，分析影响核心指标的因素有哪些，针对这因素使用视觉技术或其他传感器技术进行监控，然后快速实验）
   - 行业数据积累和建立规范，不是计算机算法和技术，所以尽量通过现场的规范来降低对算法的要求，这样可以避免因核心技术人力流动导致业务不连贯
   - 算法可以开源，但是数据不开源（算法开源开源提升公司的行业影响力）
+
+
+1. 辅助coding  测试并发量
+2. finetuning（什么时候用长prompt，知识库，finetuning）
+3. LLM VLM 微调
+4. 部署 ollama  vllm  lama.cpp  unsloth
+5. RAG  ragflow  dify
+
+
+1. unsloth
+2. tensorrt int8
+3. 辅助coding
+4. 
