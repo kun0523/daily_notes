@@ -1,6 +1,8 @@
 
 # CMake
-- [官方教程][https://cmake.org/cmake/help/latest/guide/tutorial/index.html]
+- [官方教程](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
+
+- [官方示例代码](https://cmake.org/cmake/help/latest/_downloads/cf6c5812425488ce7da62bd39aa783bc/cmake-4.0.0-rc4-tutorial-source.zip)
 
 - `CMake, Tests and Tooling for CC++ Projects [2022 Edition] ch02--09`
 
@@ -24,8 +26,61 @@
 
 ## CMake 命令
 
+- `target_compile_definitions(LibName PRIVATE "USE_MYDEF")`  在cmake文件中预定义宏变量  等同于 `#define USE_MYDEF`  用于条件编译
+- `target_compile_features`  为目标添加预期的编译功能
+- 
+
+1. 编译多文件工程
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(Test VERSION 1.0)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+configure_file(projConfig.h.in projConfig.h)   # 配置信息 可以替换文件中的 @var@ 变量 生成的文件在 PROJECT_BINARY_DIR 路径下
+add_executable(Test main.cxx func1.cxx)
+target_include_directories(Test PUBLIC "${PROJECT_BINARY_DIR}")
+```
+
+2. 编译自己的库文件  静态库  动态库
+```cmake
+cmake_minimum_required(VERSION 3.15)
+project(Test VERSION 1.0)
+
+add_library(test_compiler_flags INTERFACE)  # 接口库 不产生库文件 仅用于定义编译规则 给最终的 可执行文件+库文件 统一使用
+target_compile_features(test_compiler_flags INTERFACE cxx_std_11)
+
+add_subdirectory(MyLib)
+add_executable(Test main.cxx)
+target_link_libraries(Test PUBLIC MyLib test_compiler_flags)
+```
+```cmake MyLib
+add_library(MyLib STATIC mylib.cxx)  # STATIC 静态库  SHARED 动态库
+target_include_directories(MyLib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})  # 任何链接 MyLib 的目标都会include当前路径
+
+target_link_libraries(MyLib PUBLIC test_compiler_flags)  # 统一编译要求
+```
+3. 使用第三方库文件
+4. cmake指定条件编译
+```cmake
+add_library(MyLib STATIC MyLib.cxx)
+target_include_directories(MyLib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
+option(USE_MYMATH "state messages required!" ON)
+if(USE_MYMATH)
+    target_compile_definitions(MyLib PRIVATE "USE_MYMATH") # 向 MyLib.cxx 传递宏变量 
+    # 在 MyLib.cxx 文件中 可以使用 #ifdef USE_MYMATH 进行条件编译
+endif()
+```
+5. cmake + vcpkg 进行 C++ 库管理
+6. 指定编译可执行文件输出位置， 因为可能依赖不同版本的库
+- `set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "path/to/bin")`
+
 ### CMake 命令行指令
-- 生成MakeFile  `cmake -S dir/to/src_files -B dir/to/make_files`
+- 生成MakeFile  
+  - `cmake -S dir/to/src_files -B dir/to/make_files`
+  - `cmake -S .\Step2\ -B build -DUSE_MYMATH=OFF`  可以传递 option()
 - 编译项目： `cmake --build dir/to/make_files`
   - `cmake --build dir/to/make_files --target target_name`  指定要编译的对象，可以只编译库文件
 - 使用脚本编译工程
