@@ -152,6 +152,12 @@ int main()
   - 收尾阶段：
     - 结束释放内存
 
+## 并行推理方式
+
+1. 单context + 多线程
+2. 多个context + 多线程
+3. 多个Batch推理
+
 ## `trtexec` 工具使用
 - `--onnx=<file>`  指定onnx模型文件
 - `--fp16`  

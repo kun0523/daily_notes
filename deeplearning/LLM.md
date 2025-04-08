@@ -382,3 +382,48 @@ INT4|4.2 ( 7x1.2x0.5 ) GB|
            （固定）   （可训练的小矩阵）
 
 - TODO 增加书生实践，目标使用书生 微调千问视觉模型 使之完成压痕目标检测任务！！
+
+0. 构建数据集   
+1. 微调与模型导出  Unsloth   --> gguf
+3. 模型高效推理   vLLM  lamcpp  ollama
+
+### Unsloth
+
+#### 案例
+1. 库安装：
+  - `pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth.git`
+  - `pip install bitsandbytes unsloth_zoo`
+
+2. 预训练模型选择
+
+3. 数据集构建
+
+4. 训练过程
+5. 模型导出
+6. 模型推理
+
+#### 运行情况
+
+- 模型："DeepSeek-R1-Distill-Llama-8B"
+- 量化：load_in_4bit  4bit量化
+- 数据集："Conard/fortune-telling"
+- 训练过程：
+  - 显存：7.8G
+  - RAM：6.1G
+- 模型导出：
+  - 显存增加到 14.3G
+  - RAM增加到 8.7G
+  - 导出的模型：
+    - "unsloth.Q8_0.gguf" 文件大小 8G   8bit量化
+    - "unsloth.F16.gguf"  文件大小 15G  FP16量化
+    - "unsloth.Q4_K_M.gguf" 文件大小 4.6G 4bit量化 转换过程中是先转FP16后再转4bit
+- 使用的损失函数： Cross-Entropy Loss (评估预测下一个词的概率分布与实际下一个词的概率分布之间的差距)
+  - 0.1 ~ 1 表明模型可以很好的预测到下一个词汇，例如很简单的数据集（儿童书籍），可以达到0.5左右
+  - 2 ~ 4 表明模型表现还可以，但是任然有可提升空间，如果数据集比较复杂，常分布在这个范围
+  - 5 ~ 6 表面模型很难预测到下一个正确的词，模型表现很差
+
+
+
+
+# MCP
+- 
