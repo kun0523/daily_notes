@@ -2,13 +2,21 @@
 take notes about coding
 
 # Goals 2025
-1. cpp  - done
+1. c++  - STL  Qt
 2. cmake  - 
 3. linux  - 
 4. design pattern  - part1/02/01
     - momento design pattern  备忘录设计模式
 5. ocr
     - Intelligently extract text 05
+6. LLM
+   - **微调数据集常见形式**（列举5个常见数据集的情况），以及如何构建
+   - LLM如何微调（**使用 Unsloth案例**、huggingface案例）
+   - 如何构建Agent（Coze Dify ）
+   - 如何构建RAG 以及存在哪些问题（召回率不高，匹配精度不准），如何优化（切块的问题，向量化的问题）（AnythingLLM RagFlow）
+   - 如何构建和使用MCP  （**MCP 配合MongoDB实现类似RAG的效果**） （VScode cline）
+   - 构建自己的微调数据集，实现问答系统
+
 
 - 编程语言
   - cpp + cmake
@@ -30,17 +38,6 @@ take notes about coding
   - Agent
   - RAG
   - DeepSeek 算法思想
-
-- 0212
-  - ~~PaddleX  LCNet  MobileNet~~
-  - ~~FastDeploy  cls  OpenVINO~~
-  
-- 0213
-  - ~~RapidOCR~~
-  - PaddleX OCR
-  - ~~FastDeploy OCR~~
-  - TensorRT 配置
-  - 机器学习在工业上的应用 预测性的维护，智能排程？
 
 - 集成算法：
   - Boosting
@@ -82,14 +79,6 @@ take notes about coding
       - C3k  继承于 C3  
       - C2PSA  加入注意力机制
       - 
-  - 部署：
-    - openvino
-      - 直接推理
-      - 量化推理
-    - TensorRT
-      - 直接推理
-        - 模型文件需要转成engine
-      - 量化推理
 
 - ppocr
   - 网络：
@@ -103,38 +92,11 @@ take notes about coding
     - TensorRT
 
 
-- 0215
-  - tensorrt cls det **seg**
-  - tensorrt **linux**
-  - **dbnet crnn kie**
-  - ppocr 微调
-  - openvino
-
 - KIE
   - key information extraction 从文本或图像中提取结构化关键信息的技术
   - SER 语义实体识别：对文本进行分类标注 
   - RE  关系抽取：建立实体间的关联
 
-- 大模型 LLM
-  
-
-- TensorRT  rtx 2060 cls   det 20ms  seg  推理 + 延时统计 （1h）
-  - rtx 2060 yolo11n engine fp16
-    - cls  4.2 GFlops/112 layers/ 9.5 MB / 7ms
-    - det  6.5 GFlops/238 layers / 7.8 MB / 25 ms
-    - seg  10.4 GFlops/265 layers/ 8.6 MB / 
-  - rtx 3060 yolo11s engine fp16
-    - cls   GFlops/112 layers/  MB / ms
-    - det   GFlops/238 layers / MB / ms
-    - seg   GFlops/265 layers/ MB / 25ms
-    - 
-- OpenVINO  cls  det  seg  推理 + 延时统计 （1h）
-  - i7-10 yolo11n onnx fp16
-    - cls  4.2 GFlops/112 layers/ 10 MB / 10ms
-    - det  6.5 GFlops/238 layers / 10 MB / 60ms
-    - seg  10.4 GFlops/265 layers/ 11 MB / 
-  - 
-- TensorRT 量化
 - OCR
   - DBNet
   - CRNN + CTC Loss
@@ -183,25 +145,6 @@ take notes about coding
 3. 大模型算法思想
 4. 大模型微调
 5. 视觉大模型应用
-
-- TODO：
-  - 手搭 Mobile net ！！！
-  - 手搭 Transformer
-  - 手搭 Vit  ！！！
-  - 手搭 Swin-Transformer
-  - 复现 P2PNet
-  - LoRA微调
-
-- 0225
-  - high math
-  - opencv
-  - 
-  - ViT
-  - Swin-Transformer
-  - MobileNet V3 V4
-  - yolo
-  - Qwen-VL-7b-instructed for dent det
-  - cherrystudio + ollama
   
 
 

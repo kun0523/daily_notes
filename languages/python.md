@@ -278,6 +278,129 @@ print(next(res2))  # 1
 - 封装
 
 
+### `async`
+- 并行：在多个cpu核心上，同时处理多个任务
+- 并发：使用一个线程，看似同时处理多个任务
+
+- I/O-Bound: 任务主要受IO操作（网络、硬盘读写）限制时，最适合使用 Async
+- CPU-Bound：任务主要受CPU速度（数值计算）限制时，最适合使用多进程
+- `asyncio`
+  - Python标准库，导入 `async/await` 语法
+- `Event Loop`
+  - 管理 `coroutines` 的执行
+  - 监控 `I/O` 事件
+  - 基于当前什么任务已完成，什么任务在等待，决定接下来哪个 `coroutine` 先执行
+  - 程序员通常不能直接与`Event Loop`交互
+- `async def` 
+  - 定义一个**可以暂停 可以后续恢复**执行的函数
+  - 当调用一个`async def`函数时，通常不会立即运行，它会回传一个`coroutine object`，可以看作是一个计划或者一个可以运行的任务
+  - 在函数体内，遇到 `await` 时，向`Event Loop`交出控制权
+- `await`
+  - 只可用在 `async def` 函数内部
+  - 向`Python Event Loop` 交出控制权，类似于说，"我要等待当前任务运行，你可以先做其他任务"
+- `asyncio.run()`
+  - 用于最高层的 corutine 函数入口
+  - 用于自己 APP 中的最高层
+  - 不可在 `async def` 函数体内调用
+- `asyncio.sleep(0)`
+  - 在计算密集型任务中，如果想用 asyncio，则在任务开始前先使用 `asyncio.sleep(0)` 交出控制权
+- `task_obj = asyncio.create_task(coroutine_obj)`
+  - 将一个 `corutine obj` 包装为一个 `Task obj` 
+  - 在 create_task return 后，即开始执行
+  - 插入到 `Event Loop` 中
+- `results = await asyncio.gather(task1, task2, task3)`
+  - 等待 `Event Loop` 中的任务全部执行完成
+
+### 并发、并行
+
+- 并发 Concurrency
+  - 多个任务看似同时进行
+  - 可以使用多线程（multi-thread）或者协程（coroutine）实现
+  - 协程 coroutine 通过 EventLoop 管理，暂停或者继续执行子程序 subroutine
+  - 适用于 **I/O密集型** 任务
+  - `concurrent.futures.ThreadPoolExecutor`  --- 多线程
+  - `asyncio`  --- 协程
+
+- 并行 Parallelism
+  - 多个任务同时进行
+  - 使用多进程（multi-processing）实现
+  - 适用于 **CPU密集型** 任务
+  - `multiprocessing.Pool`  --- 多进程
+
+```python
+import asyncio
+import concurrent.futures
+import multiprocessing
+import concurrent
+from concurrent.futures import ThreadPoolExecutor
+import time
+
+# Coroutine
+async def fetch_data(num:int):
+    print(f"Start fetch data: {num}")
+    await asyncio.sleep(num)  # Simulating I/O operation
+    print(f"Complete fetch data: {num}")
+    return f"Data-{num}"
+
+# Concurrent operation
+def process_data(num):
+    # I/O-bound operation
+    print(f"Start Process Data: {num}")
+    time.sleep(num)
+    print(f"Finished Process Data: {num}")
+    return f"process result: {num}"
+
+# Parallel operation
+def heavy_computation(num):
+    # CPU-intensive operation
+    print(f"Start Heavy Computation: {num}")
+    time.sleep(num)
+    print(f"Finished Heavy Computation: {num}")
+    return f"heavy computation: {num}"
+
+def on_result(result):
+    print(f"Received Result: {result}")    
+
+async def main():
+    # Coroutine for I/O operations
+    data = await asyncio.gather(
+        asyncio.create_task(fetch_data(3)), 
+        asyncio.create_task(fetch_data(2)), 
+        asyncio.create_task(fetch_data(1)), 
+        )
+    for d in data:
+        print(d)
+    
+    print("-------------------------")
+    
+    # Concurrent execution for I/O-bound tasks
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = [executor.submit(process_data, i) for i in [3, 2, 1]]
+        
+        for future in concurrent.futures.as_completed(futures):
+            print(future.result())
+        
+    print("+++++++++++++++++++++++++++")
+    
+    # Parallel execution for CPU-bound tasks
+    with multiprocessing.Pool(processes=3) as pool:
+        # map 阻塞式
+        results = pool.map(heavy_computation, [3, 2, 1])
+        print(results)
+        
+        # apply_async 非阻塞式
+        res = []
+        for i in [3, 2, 1]:
+            res.append(pool.apply_async(heavy_computation, args=(i,), callback=on_result))
+            
+        for r in res:
+            r.wait()
+            print(r.get())
+
+if __name__ == '__main__':
+    asyncio.run(main())
+```
+
 
 ## 小案例
 

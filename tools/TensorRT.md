@@ -165,9 +165,9 @@ int main()
 - `--verbose`  显示详细信息  默认不显示
 
 ### onnx 转 engine
-- `trtexec --onnx=path/to/model.onnx --saveEngine=path/to/model_fp32.onnx` 
+- `trtexec --onnx=path/to/model.onnx --saveEngine=path/to/model_fp32.engine` 
   - `fp32` 精度的文件大小比原onnx文件还大一些
-- `trtexec --onnx=path/to/model.onnx --saveEngine=path/to/model_fp16.onnx --fp16`
+- `trtexec --onnx=path/to/model.onnx --saveEngine=path/to/model_fp16.engine --fp16`
   - `fp16` 精度的文件大小比原onnx文件小差不多一半
 - TODO: 转int8 ... ... 
 
