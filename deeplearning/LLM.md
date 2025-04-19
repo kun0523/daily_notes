@@ -15,6 +15,9 @@
 - 课程：
   - 李宏毅  `https://speech.ee.ntu.edu.tw/~hylee/ml/2025-spring.php`
   - datawhale  `https://github.com/datawhalechina/self-llm`
+  - transformer `https://www.youtube.com/watch?v=KJtZARuO3JY`
+  - mcp `https://www.youtube.com/watch?v=Ek8JHgZtmcI&t=264s`
+  - n8n `https://www.youtube.com/watch?v=nwYHurRo4e0`
 
 - 关键点
   - 数据
@@ -34,12 +37,20 @@
 2. 整理unsloth微调过程
 3. 微调后的模型使用 ollama vllm xinference llamacpp 部署，对比性能
 4. 整理数据组织形式
+5. 尝试RagFlow
 
 - 是不是可以使用大模型，配合知识库，产生高质量的回答，再组成数据集，去微调小模型？？
 - 视觉大模型怎么微调，数据怎么组织？
-- 对比测试 Qwen2.5-VL 与 PP-tablemagic 对比两种算法对表格的识别效果
+- 对比测试 Qwen 2.5-VL 与 PP-tablemagic 对比两种算法对表格的识别效果
 - 是不是可以用 tablemagic 先预标一批数据，然后去微调 Qwen2.5-VL？？
+- QWen2.5-VL  解析账单图片 记录金额和类别
 
+- ![GPU算力与通信速度](../image_resources/GPU禁售.png)
+
+- ![alt text](image.png)
+- ![alt text](image-1.png)
+- ![alt text](image-2.png)
+- ![alt text](image-3.png)
 # 源（模型+数据）
 
 ## HuggingFace
@@ -238,15 +249,19 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
 
 # 微调
-
+- [多GPU训练资源使用-李宏毅助教课程](https://www.youtube.com/watch?v=mpuRca2UZtI)
 - 微调的目的：
   1. 专业领域适配：在特定领域有更精准的知识和表达能力，通过有针对性的微调可以显著提升模型的专业术语理解和专业问题解答能力；
   2. 定制化行为和风格：调整输出风格；
   3. 提高特定任务性能：例如文本分类、情感分析、摘要生成等
   4. 减少幻觉和不确定性；
-  - 
+
+- **全量训练** 8B 模型需要 8*V100（32G）
 
 ## 微调方法
+
+- LLaMA2 微调数据量 27540笔数据  
+- LIMA Less Is More for Alignment 也有人精标1000+笔数据进行微调
 
 ### LoRA
 - PEFT Parameter-Efficient Fine-Tuning PEFT
@@ -493,7 +508,26 @@ print(chain.invoke("how can I use paddlex?"))
 - 如何调用别人的MCP服务
 
 ### 如何开发
-- 如何自己开发MCP服务
+- 安装SDK  有Python/C#/Java等版本的
+  - `uv install mcp[cli]`
+- 开发具体工具
+  ```python
+  from mcp.server.fastmcp import FastMCP
+
+  mcp = FastMCP()
+
+  @mcp.tool()
+  def say_hello():
+    """
+    打个招呼
+    """
+    return "Hello MCP"
+  ```
+
+- 测试功能是否正常
+  - `mcp dev path/to/tool.py` 会在本地启动测试服务，在网页中可以进行功能测试
+  - 先点击Connect，然后在Tools页面可以查看自己定义的工具选项
+  - 修改脚本代码后，需要重新启动server后，才能在测试页面看到更新
 
 ## Agent
 - 基于大模型，通过配置 `system prompt` 构建完成不同任务的 Agent
