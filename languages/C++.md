@@ -718,7 +718,7 @@ struct Point{
     double y;
 };
 
-extern "C" __declspec(dllexport) void AddPoints(const void* p1, const void* p2, void* res){
+extern "C" __declspec(dllexport) void __stdcall AddPoints(const void* p1, const void* p2, void* res){
     Point* p1_ = (Point*)p1;
     Point* p2_ = (Point*)p2;
     Point* res_ = (Point*)res;
@@ -735,10 +735,29 @@ extern "C" __declspec(dllexport) void AddPoints(const void* p1, const void* p2, 
   - 以C语言的方式导出函数，不对函数名进行cpp的修饰，便于调用时找到该函数
   - 所以不能使用函数重载特性，两个函数名相同的函数，会导致找不到想要的函数
   - extern  作为外部函数
-- `__declspec(dllexport)`
-- 
-- `__declspec(dllimport)`
-- 
+- `__declspec(dllexport)` 和 `__declspec(dllimport)`
+  ```C++
+  // In MyLibrary.h
+
+  #ifdef MYLIBRARY_EXPORTS  // 在CMakeLists中 通过 -DMYLIBRARY_EXPORTS 定义
+    // We’re building the DLL itself
+    #define MYAPI __declspec(dllexport)
+  #else
+    // We’re a consumer of the DLL
+    #define MYAPI __declspec(dllimport)
+  #endif
+
+  extern "C" {
+    MYAPI int __stdcall  Add(int a, int b);
+    MYAPI void __cdecl  ProcessBuffer(char* buf, size_t len);
+  }
+  ```
+- `__cdecl` 和 `__stdcall`
+  - call convention
+  - 仅有C/C++ 客户端代码调用时，使用  `__cdecl`
+  - 当使用其他语言调用dll时，使用 `__stdcall`，例如 C# VB
+  - `__cdecl` 调用方清理栈空间
+  - `__stdcall`  被调方清理栈空间
 
 
 # 网络编程
