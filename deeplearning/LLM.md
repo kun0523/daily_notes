@@ -12,6 +12,8 @@
   - RAG服务：RagFlow
   - 构建工作流：Dify  Coze  n8n(灵活度高)
   - 模型能力拓展：MCP
+  - 目标：unsloth(模型微调) + vLLM（部署模型）+ RagFlow（本地知识库）+ n8n（工作流）+ MCP（工具调用）  （Docker 部署服务）
+  - 自动提取数据库数据，做数据分析，呈现图表，反馈问题
 - 课程：
   - 李宏毅  `https://speech.ee.ntu.edu.tw/~hylee/ml/2025-spring.php`
   - datawhale  `https://github.com/datawhalechina/self-llm`
@@ -195,17 +197,51 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
 # 数据集
 
+- 常见预训练LLM所用的训练数据量：
+  - LAMA 3 预训练用了 15T 的资料
+  - DeepSeekV3 14.8T
+- 数据集中，关于**同一个对象有多种不同方式的介绍**，可以大幅提高模型的理解
 - [instruction fine-tuning 数据集优化论文](https://arxiv.org/pdf/2402.04833)
 - Curriculum Learning 渐进式训练策略，让模型先训练简单数据集，再训练复杂数据集，逐渐提升难度
-## 常见数据集1 
-- 数量：
+
+- https://www.youtube.com/watch?v=qycxA-xX_OY
+## 数据预处理
+- 数据去重很重要，要尽可能让模型看到多样性的资料
+- [The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale](https://arxiv.org/pdf/2406.17557)  讲了哪些过滤方法效果比较好 TODO 待整理
+- [The Falcon Series of Open Language Models 有关数据集处理](https://arxiv.org/pdf/2311.16867)
+- ![alt text](image-4.png)
+- [](https://arxiv.org/pdf/2405.05904)
+  - ![将问题类型分为四类，看哪种资料更有效](image-5.png)
+  - 结论是：模型在Alignment Known的资料，在DevelopmentSet上的效果在变好，当Alignment UnKnown的资料时，在DevelopmentSet上的效果在变差，即让Pretrained模型针对未知的问题进行Alignment微调时，模型本身能力会劣化
+  - ![预训练模型在已知问题和未知问题集上微调时的效果](image-6.png)
+  - ![MaybeKnown上训练效果最好](image-7.png)
+
+- 将原始资料，喂给LLM，由模型产生的回答，再组成数据集，去训练，往往能得到更好的结果
+  - [self-instruct](https://arxiv.org/pdf/2212.10560)
+  - ![alt text](image-9.png)
+
+## 常见数据集1  Alpaca  AlpacaGauss
+- https://huggingface.co/datasets/tatsu-lab/alpaca
+- 数量：52k
 - 数据格式：
 - 调用方法：
+
+## 常见数据集 Dolly
+
+
+## 常见数据集 LIMA
 
 ## 常见数据集2 - 推理模型数据集
 - 数量：
 - 数据格式：
 - 调用方法：
+
+## Knowlage Distillation
+- 知识蒸馏
+- 整理高质量的问题，然后调用品质高的大模型回答，然后使用这些问答对去微调自己的模型
+  - 可以尝试用大模型配合知识库，去生成高质量的回答
+- 通常使用几千几万笔数据就可以做到很好的效果
+- 可以整理好数据集后，依次传给LLM，**让LLM对样本打分**，根据这个分值，可以对数据集进行进一步的筛选和排序
 
 # 预训练大模型
 
@@ -259,6 +295,12 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
   3. 提高特定任务性能：例如文本分类、情感分析、摘要生成等
   4. 减少幻觉和不确定性；
 
+- Alignment 其实不能让模型学到新知识，只能让模型将自己已知的信息按一定格式输出，如果使用模型未知的知识去微调训练，反而会让模型表现劣化
+- RL是一种很好的Alignment方法，让模型产生多个回答，选择最好的回答，让模型自己学（符合模型已知，调整输出方法的概念）
+- ![alt text](image-8.png)
+
+- [PPO DPO GRPO](https://anukriti-ranjan.medium.com/preference-tuning-llms-ppo-dpo-grpo-a-simple-guide-135765c87090)
+
 - **全量训练** 8B 模型需要 8*V100（32G）
 
 - PreTrain Style  全量参数 + 对专业领域文章进行文字接龙
@@ -289,7 +331,18 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
 ### Instruct Fine Tuning
 
-### GRPO
+### 强化学习
+
+#### PPO  
+
+- 关键概念：
+  - Policy 策略
+  - Reward Model  奖励
+  - Value Function 价值函数 （类似助理教练） 用于对每个状态“好”的程度的估计
+
+#### DPO
+
+#### GRPO
 
 ### 微调容易造成遗忘 Catastrophic Forgetting
 
@@ -562,7 +615,7 @@ print(chain.invoke("how can I use paddlex?"))
 ### Coze
 
 
-# 模型大小与运行显存估算
+## 模型大小与运行显存估算
 
 - 参数存储公式：显存需求 = 参数量 × 每个参数字节数 × 安全系数（通常取1.2）
   - FP32：每个参数占4字节
@@ -913,8 +966,8 @@ In an LLM context, **GRPO most likely stands for Group Ratio Policy Optimization
 If the context *was* about using an LLM *within* an ERP system or *discussing* business processes, then the "Goods Receipt Purchase Order" meaning could be relevant, but it's less likely if the discussion is about the LLM's training or alignment algorithms.
 
 
-
-# LHY - HW
+# 课程
+## LHY - HW
 
 - [NTU 李宏毅 ML2025](https://speech.ee.ntu.edu.tw/~hylee/ml/2025-spring.php)
 

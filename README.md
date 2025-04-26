@@ -17,6 +17,73 @@ take notes about coding
    - 如何构建和使用MCP  （**MCP 配合MongoDB实现类似RAG的效果**） （VScode cline）
    - 构建自己的微调数据集，实现问答系统
 
+- 粮食安全主动权
+- 国际农业技术
+- 种业
+- 农机
+
+- 农业强国
+  - 农田战略化  
+
+- 安全感
+  - 社会安定/企业稳定
+  - 稳定和谐的家庭
+  - 钱和创造财富的能力
+- 政策提振
+- 基本面改善
+
+- 方法
+  - 历史溯源 
+  - 技术形态
+  - 价量关系
+----
+- 0424
+  - cls dll test
+  - hw5 hw6
+  - llm from scratch
+- bf vac
+  - test complete 
+  - yolo algorithm
+  - collect doc scan datasets about chinese + english + tables
+- wk
+    - cls det seg dll: run + test + log
+      - 异常处理
+        - 模型文件找不到
+        - 模型读取错误
+        - 推理错误
+        - 模型输入错误
+        - 因模型节点名称错误，导致的模型加载错误
+    - datasets  
+      - 破碎检测  建议保留原有的基础上，加入犯错的
+      - 压痕检测
+- vis
+    - yolo  yoloworld
+    - ocr  onnx  + training  (对扫描文本做ocr 对比pp和VL的识别效果)
+    - opencv
+    - FLUX 样本生成
+    - 表格识别（对比 tablemagic 和 VL的识别效果）
+    - 对比 1. ocr+llm  2. llm-vl 速度和效果
+- llm + vlm
+    - dataset
+    - unsloth  finetune llm+vlm export gguf
+    - vllm  可以支持的模型格式有哪些？
+    - n8n  （base on knowlage answer）
+    - ragflow  
+    - RL（PPO  DPO  GRPO）
+    - docker vllm to inference LLM/VLM(Qwen) for screenshot of account
+---
+
+- https://ysymyth.github.io/The-Second-Half
+1. 整理LLM notes
+    - 模型微调与模型导出 LoRA  gguf
+    - 使用huggingface 一步一步推理
+    - 模型部署推理  vLLM Ollama
+    - 数据集  组织方式
+    - 强化微调 GRPO  PPO  DPO
+    - 整理完微调的代码和笔记 + alpaca 数据集
+    - 完成hw5 qwen + llama
+
+
 
 - 编程语言
   - cpp + cmake
