@@ -18,6 +18,9 @@
   - transformer `https://www.youtube.com/watch?v=KJtZARuO3JY`
   - mcp `https://www.youtube.com/watch?v=Ek8JHgZtmcI&t=264s`
   - n8n `https://www.youtube.com/watch?v=nwYHurRo4e0`
+- 自建案例：
+  - n8n 搭建记账系统，自己看交易截图，记录金额和种类，定期汇总后发邮件
+  - RagFlow 知识库  关于摄影 器材 镜头 打光 焦段等，特定场景应该怎么拍
 
 - 关键点
   - 数据
@@ -258,6 +261,10 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
 - **全量训练** 8B 模型需要 8*V100（32G）
 
+- PreTrain Style  全量参数 + 对专业领域文章进行文字接龙
+- SFT Style  Adapter + 专业领域问答对
+- RL Style  专业领域问题 + 正确判定反馈
+
 ## 微调方法
 
 - LLaMA2 微调数据量 27540笔数据  
@@ -283,6 +290,15 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 ### Instruct Fine Tuning
 
 ### GRPO
+
+### 微调容易造成遗忘 Catastrophic Forgetting
+
+1. 保留少部分之前的训练数据，加入到新数据集中，一起微调
+2. 让微调前的模型，自问自答，产生一批数据，加入到新数据中进行微调
+3. **self-output**:已经收集好了一批数据，问题的回答部分，传给微调前的大模型，**让LLM用自己的话转述一遍，加入到新数据集中** （有论文研究发现这种方法效果很好，且几乎没有遗忘现象）**缓解遗忘最好的方法**
+   1. (I Learn Better If You Speak My Language)[https://arxiv.org/abs/2402.11192]
+   2. 语音模型也可以用类似的方法训练：![基于语言模型微调语音识别模型-先用这个语言模型生成一份答案，再去微调语音模型](image-4.png)
+   3. DeSTA2 [DeSTA2](https://arxiv.org/abs/2409.20007)  ![DeSTA2](image-5.png)
 
 ## 微调框架
 
