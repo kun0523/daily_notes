@@ -289,7 +289,17 @@ kill | 发送信号到指定的进程，通常用于杀死进程 | `kill PID`，
 # Git
 
 ## 本地仓库与远程仓库关联
+### 生成Global配置信息
+- `git config --global user.name user_name`
+- `git config --global user.email email_addr`
+- `git config --list` 查看配置是否生效
 ### 使用SSH密钥
 - 本地产生密钥，将公钥复制到github
-### 使用Token
-- github产生token，在本地使用用户名+token登录
+- `ssh-keygen -t rsa -b 4096 -C email_addr`
+  - `-b 4096` 设定秘钥长度
+- `cat ~/.ssh/id_rsa.pub`  查看公钥，并将其原封不动的复制粘贴在 github  settings >> SSH and GPG keys
+- `ssh -Tv git@github.com`  验证秘钥是否配置成功 如果显示"successfully authenticated" 就说明成功
+  - 有可能发生失败，可能是因为dns解析错误，没有找到真正github的服务器ip地址，需要自己修改hosts文件，明确指定github的ip
+
+### 管理远程仓库
+- `git clone git@github.com:user_name/repo_name.git`
