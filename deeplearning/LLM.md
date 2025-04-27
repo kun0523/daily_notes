@@ -51,11 +51,10 @@
 - QWen2.5-VL  解析账单图片 记录金额和类别
 
 - ![GPU算力与通信速度](../image_resources/GPU禁售.png)
-
-- ![alt text](image.png)
-- ![alt text](image-1.png)
-- ![alt text](image-2.png)
-- ![alt text](image-3.png)
+- ![DeepSeek R1 特色](../image_resources/GPU带宽与算力.png)
+- ![GPU带宽与算力](../image_resources/GPU带宽与算力.png)
+- ![人工标注对模型表现的影响](../image_resources/structure_performance.png)
+- ![训练三阶段](../image_resources/PreTrain-SFT-RLHF.png)
 # 源（模型+数据）
 
 ## HuggingFace
@@ -209,8 +208,8 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 - 数据去重很重要，要尽可能让模型看到多样性的资料
 - [The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale](https://arxiv.org/pdf/2406.17557)  讲了哪些过滤方法效果比较好 TODO 待整理
 - [The Falcon Series of Open Language Models 有关数据集处理](https://arxiv.org/pdf/2311.16867)
-- ![alt text](image-4.png)
-- [](https://arxiv.org/pdf/2405.05904)
+- ![语音识别LLM训练方式](image-4.png)
+- [论文](https://arxiv.org/pdf/2405.05904)
   - ![将问题类型分为四类，看哪种资料更有效](image-5.png)
   - 结论是：模型在Alignment Known的资料，在DevelopmentSet上的效果在变好，当Alignment UnKnown的资料时，在DevelopmentSet上的效果在变差，即让Pretrained模型针对未知的问题进行Alignment微调时，模型本身能力会劣化
   - ![预训练模型在已知问题和未知问题集上微调时的效果](image-6.png)
@@ -613,6 +612,15 @@ print(chain.invoke("how can I use paddlex?"))
 ### Dify
 
 ### Coze
+
+### n8n
+- 安装
+  - `npx n8n`
+  - 
+
+- Docker
+  - 运行  `docker run -it --rm --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n`
+- 
 
 
 ## 模型大小与运行显存估算
