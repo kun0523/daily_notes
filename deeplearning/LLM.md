@@ -294,6 +294,11 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
   3. 提高特定任务性能：例如文本分类、情感分析、摘要生成等
   4. 减少幻觉和不确定性；
 
+- ![LLM微调的四种方法](../image_resources/finetune-llm.png)
+- RL 是强化强化模型原有的能力，对于大模型(>32B)有显著的强化效果，对于较小的模型(<=32B) 没有显著的强化效果
+> 所以，如果要使用的是较小的模型（<32B），建议直接使用大模型生成大量训练资料，去微调小模型（蒸馏大模型的经验）
+
+
 - Alignment 其实不能让模型学到新知识，只能让模型将自己已知的信息按一定格式输出，如果使用模型未知的知识去微调训练，反而会让模型表现劣化
 - RL是一种很好的Alignment方法，让模型产生多个回答，选择最好的回答，让模型自己学（符合模型已知，调整输出方法的概念）
 - ![alt text](image-8.png)
@@ -330,7 +335,8 @@ response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
 ### Instruct Fine Tuning
 
-### 强化学习
+### 强化学习 RL
+
 
 #### PPO  
 
