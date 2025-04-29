@@ -61,6 +61,32 @@ conda pack -p env_path -o path/to/save/file_name.tar.gz
   - `-c`  保留黑窗
 
 
+### UV
+
+#### 安装`uv`
+- `pipx install uv`  为uv命令打包独立的虚拟环境
+
+#### `uv`使用流程
+- 创建项目
+  - `uv init proj_name`
+- 创建虚拟环境
+  - `uv venv env_name --python 3.11 --seed`
+    - `--seed` 安装 pip 和 setuptools
+    - 需要从github上下载，可能出现连接超时的问题，可以使用镜像源
+    - `export UV_PYTHON_INSTALL_MIRROR=https://github-proxy.lixxing.top/https://github.com/indygreg/python-build-standalone/releases/download`
+    - github镜像源获取地址：`https://github.akams.cn/`
+  - `source env_name/bin/activate`  激活虚拟环境
+- 配置pip源
+  - `vim ~/.config/uv/uv.toml`
+    - 如果不存在这个文件，就新建该目录和文件
+  ```config
+  [[index]]
+  url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+  default = true
+  ```
+- 打包导出
+
+
 ## 常用的三方库
 
 ### `sys`

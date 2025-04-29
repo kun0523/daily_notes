@@ -73,6 +73,10 @@ take notes about coding
     - docker vllm to inference LLM/VLM(Qwen) for screenshot of account
 ---
 
+- 国产显卡 沐曦 MXGPU
+  - LMDeploy
+  - Xtuner
+
 - https://ysymyth.github.io/The-Second-Half
 1. 整理LLM notes
     - 模型微调与模型导出 LoRA  gguf
