@@ -48,11 +48,15 @@ take notes about coding
 - wk
     - cls det seg dll: run + test + log
       - 异常处理
-        - 模型文件找不到
-        - 模型读取错误
         - 推理错误
-        - 模型输入错误
-        - 因模型节点名称错误，导致的模型加载错误
+        - c# test code add commit
+        - 模型文件不存在
+        - 模型文件格式错误
+        - 模型文件节点错误
+        - 几千张图片推理测试是否内存泄漏
+      - C# 加图像输出
+      - 写一个TensorRT 推理环境配置的文档 注意tensorrt版本与cuda 显卡的匹配关系
+
     - datasets  
       - 破碎检测  建议保留原有的基础上，加入犯错的
       - 压痕检测
@@ -73,6 +77,19 @@ take notes about coding
     - docker vllm to inference LLM/VLM(Qwen) for screenshot of account
 ---
 
+- 五一
+  - vllm model inference 
+  - n8n workflow  / compare to dify
+  - RAGFlow 
+  - unsloth fine tune llm  vlm  / compare to xtuner
+
+- TODO
+  - python unicorn / fastapi (简单的启服务，多并发调用)
+  - linux vim install extensions to python/C++ ide
+  - docker compose 
+  - ssh to server
+  - java server + C++ inference .so
+
 - 国产显卡 沐曦 MXGPU
   - LMDeploy
   - Xtuner
@@ -86,7 +103,6 @@ take notes about coding
     - 强化微调 GRPO  PPO  DPO
     - 整理完微调的代码和笔记 + alpaca 数据集
     - 完成hw5 qwen + llama
-
 
 
 - 编程语言
