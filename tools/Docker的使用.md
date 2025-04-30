@@ -1,7 +1,38 @@
 # Docker
 
 ## 安装
-- 
+
+### Ubuntu 环境下
+
+1. 添加 gpg key
+   ```bash
+    # Add Docker's official GPG key:
+    sudo apt-get update
+    sudo apt-get install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources:
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+      $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
+   ```
+2. 下载 deb 文件
+   - `https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb?utm_source=docker&utm_medium=webreferral&utm_campaign=docs-driven-download-linux-amd64`
+3. 安装
+   ```bash
+    sudo apt-get update
+    sudo apt-get install ./docker-desktop-amd64.deb
+   ```
+   
+4. 启动 daemon 
+   - 上一步完成后，在所有应用中应该可以看到 Docker Desktop 应用
+   - 运行 `Docker Desktop`
+   - 如果想要向DockerHub上传镜像，则需要登录账号，如果只是拉取镜像，则不需要登录账户
+
 
 ## `Image` 管理
 - `docker pull <image>` 从Docker Hub拉取指定镜像
