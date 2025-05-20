@@ -1,5 +1,9 @@
 # TensorRT
 
+- 注意：
+  - 部署显卡算力与开发时使用显卡算力不一致时，模型engine文件不通用，报错信息：算力不匹配；
+  - 解决方法：在部署的设备电脑上，重新导出`engine`文件
+  - 
 ## TensorRT CUDA cuDNN 本地版本查询
 - TensorRT
   - 查看安装包
@@ -13,7 +17,7 @@
     - `CUDNN_PATCHLEVEL 7`
 
 ## 三者匹配关系查询
-- CUDA 11.8、cuDNN 8.9.0、TensorRT 8.6.1：适用于30系卡  自测试OK
+- CUDA 11.8、cuDNN 8.6.0、TensorRT 8.6.1：适用于30系卡  自测试OK
 - https://docs.nvidia.com/deeplearning/tensorrt/latest/getting-started/support-matrix.html
 - 
 ## Windows安装

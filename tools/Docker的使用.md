@@ -41,6 +41,7 @@
 - `docker pull <image>` 从Docker Hub拉取指定镜像
 - `docker images`  查看当前本地有的镜像
 - `docker rmi <image>`  删除指定的镜像
+- `docker image rm <image_id>` 删除指定的镜像
 - `docker run <options> <image>`  创建并启动一个容器
   - 每次执行 `docker run` 都会创建一个**新的容器实例**
   - `docker run -d`  以后台模式运行
@@ -48,7 +49,7 @@
 
 
 ## `Container` 管理
-
+![容器的生命周期](../image_resources/container_lifecycle.png)
 - `docker ps`  列出当前正在运行的容器
   - `docker ps -a`  列出所有容器，包括停止状态的
 - `docker start <container>`  启动已经停止的容器
@@ -57,6 +58,9 @@
 - `docker rm <container>`  删除已经停止的容器
 - `docker exec -it <container> <command>`  在**运行的容器中**执行命令
   - `docker exec -it -u <user_name> <container> <command>`
+- 查看在运行的容器的id：`docker ps -q`
+- 停止所有在运行的容器：`docker stop $(docker ps -q)`
+- 删除所有容器：`docker rm $(docker ps -aq)`
 - 退出docker运行环境 `ctrl+d` 
 
 ## 数据卷

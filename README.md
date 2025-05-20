@@ -2,6 +2,9 @@
 take notes about coding
 
 # Goals 2025
+0. 使用 docker + fastapi 部署 图片分类+目标检测+实例分割等任务
+   1. 先实现python调用三个框架
+   2. 再尝试调用C++
 1. c++  - STL  Qt
 2. cmake  - 
 3. linux  - 
