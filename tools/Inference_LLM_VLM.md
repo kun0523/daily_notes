@@ -5,7 +5,45 @@
    1. n8n 构建由LLM决策驱动的工作流
    2. RAG 可以检索 关系型数据库 + 图数据库 + 向量数据库，作为prompt
 3. 大模型微调  如果大模型在特定专业领域效果不好，则尝试微调
-4. 
+
+
+## Transformers
+
+
+```python
+import time
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+print("Use Transformers")
+
+model_path = "./qwen/Qwen3-1.7B"
+# model_path = "/root/mimo"  # Failed maybe VRAM too small
+# model_path = "/root/qwen3/Qwen3-0.6B-FP8"  # 当前显卡不支持 FP8 推理
+print(f"Use Model: {model_path}")
+
+tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained(model_path, device_map="auto", trust_remote_code=True).eval()
+
+input_texts = ["Hi, please introduce yourself", "Shanghai is"]
+
+start_time = time.time()
+responses = []
+for text in input_texts:
+    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    outputs = model.generate(**inputs)
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    responses.append(response)
+#'''
+# around 9s to use transformers
+
+
+end_time = time.time()
+elapsed_time = end_time - start_time
+
+print(responses)
+print(f"Total cost: {elapsed_time} s")
+
+```
 
 
 ## vllm
@@ -38,10 +76,29 @@
   - `--served-model-name`: 对外暴露的模型名称路径。
   - `--response-role`: 设置 OpenAI API 兼容接口返回消息中的 role 字段。
 
-
-
 - 测试服务
+  - 接口举例
+    - `http://localhost:8000/v1/models`  GET 获取支持的模型
+    - `http://localhost:8000/v1/chat/completions`  POST 对话  只支持 **messages**
+      - ```bash
+          {  
+            "model": "NousResearch/Meta-Llama-3-8B-Instruct",  
+            "messages": [  
+              {"role": "system", "content": "You are a helpful assistant."},  
+              {"role": "user", "content": "What is machine learning?"}  
+            ]  
+          } 
+        ```
+    - `http://localhost:8000/v1/completions`  POST 文本续写
+      - ```bash
+          {  
+            "model": "NousResearch/Meta-Llama-3-8B-Instruct",  
+            "prompt": "Machine learning is",  
+            "max_tokens": 100  
+          }
+        ```
   - curl 测试
+    - model 字段，要与 `vllm serve model_path`  model_path 保持一致，否则会报找不到模型错误
   ```bash
   curl http://127.0.0.1:8000/v1/completions \
       -H "Content-Type: application/json" \
@@ -78,11 +135,53 @@
 
 ### 离线批量推理测试
 
+- 使用 python库加载模型并执行推理，打印结果
+```python
+
+```
+
 ## xinference
+
+- 需要提前安装好 CUDA 和 pytorch
+- `pip install "xinference[transformers]"`  
+  - `xinference[all]`  llama-cpp-python 会编译错误，待解决
+- 启动本地服务：
+  - `xinference-local --host 192.168.3.9 --port 9997`
+    - 这里使用了局域网ip，为了让部署在docker里的Dify可以访问
+    - ![xinference-ui](../image_resources/xinference_control_pad.png)
+    - `Launch Model` 选择要部署的模型
+    - `Running Models` 查看正在运行的模型，可以打开`webui`测试模型效果
+    - `Cluster Information` 查看系统资源使用情况
+  - 更改模型保存路径：`export XINFERENCE_HOME=/path/to/save`
+    - 在启动服务时，可能会报没有写入权限的错误，因为xinference要向这个文件夹写入模型和日志
+    - `sudo chmod 777 /path/to/save`  赋权
+  - 更改模型下载源：`export XINFERENCE_MODEL_SRC="modelscope"`
 
 ## llama.cpp
 
 ## ollama
+
+### 安装
+- `curl -fsSL https://ollama.com/install.sh | sh`
+- 测试：`curl -v http://localhost:11434`  返回： "Ollama is running" 即成功
+- 修改模型默认的存储路径：`export OLLAMA_MODELS=/path/to/save/models`
+  - 默认存储路径：`/usr/share/ollama/.ollama/models`
+  - 修改后需要赋权给ollama `sudo chown -R ollama:ollama /path/to/save/models`
+- 修改ollama host `export OLLAMA_HOST=0.0.0.0:11434`  监听所有ip
+- `OLLAMA_HOST=0.0.0.0:11434 ollama serve`  修改环境变量可能没有生效，直接指定后启动服务，可以确定有效
+  - 发现这种方式更稳定，这样启动服务后，就可以直接使用 ollama命令
+
+### 使用
+- `ollama list`  查看本地现有镜像
+- `ollama run qwen3`  拉取并进入交互模式
+- `ollama pull qwen3` 仅拉取镜像
+- `ollama rm qwen3`  删除模型
+- `ollama ps` 查看正在运行的模型
+- 
+- `sudo systemctl restart ollama`  重启ollama服务
+- `sudo systemctl stop ollama`  停止ollama服务
+- `sudo systemctl status ollama`  查看服务状态
+- 
 
 
 ## LMDeploy
@@ -111,7 +210,15 @@ LMDEPLOY_TARGET_DEVICE=maca python setup.py develop
 
 ### 服务
 
+- `lmdeploy serve api_server model_pth --server-port 2333 --session-len 8192`
+
 - ``
 
+#### API 接口
+- 与 vllm 类似
+- `http://0.0.0.0:2333/v1/models`
+- `http://0.0.0.0:2333/v1/completions`
+- `http://0.0.0.0:2333/v1/chat/completions`
+- 
 
 ### Python

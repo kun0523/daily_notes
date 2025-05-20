@@ -33,6 +33,9 @@
    - 运行 `Docker Desktop`
    - 如果想要向DockerHub上传镜像，则需要登录账号，如果只是拉取镜像，则不需要登录账户
 
+5. 配置开启自启
+   - `sudo systemctl enable docker`
+
 
 ## `Image` 管理
 - `docker pull <image>` 从Docker Hub拉取指定镜像
@@ -88,6 +91,45 @@
   - 简介：用于创建跨多个Docker宿主机的容器网络，它允许不同宿主机上的容器之间的通过容器网络进行通信；
   
 ## 使用`SSH`
+
+## Docker Compose
+
+- 可以同时管理多个docker contiainer
+- 查看compose版本：`docker compose version`
+- 完整生命周期操作：
+  - 启动：`docker compose up -d`
+  - 查看运行状态：`docker compose ps`
+  - 查看日志（调试，**仅在运行过程中可以查看**）：`docker compose logs`
+  - 停止(保留数据卷，删除容器)：`docker compose down`
+  - 停止并删除数据卷和镜像：`docker compose down -v --rmi all`
+  - 清理残留的资源：`docker system prune -a`
+- 
+
+## 镜像配置加速
+
+- `daemon.json` 文件位置： `/etc/docker/daemon.json`
+```json
+ {
+    "registry-mirrors": [
+      "https://docker.xuanyuan.me",
+      "https://docker-0.unsee.tech",
+      "https://docker.hlmirror.com",
+      "https://docker.imgdb.de",
+      "https://docker.m.daocloud.io",
+      "https://mirror.ccs.tencentyun.com"
+    ],
+    "log-driver": "json-file",
+    "log-opts":{
+      "max-size": "100m"  // 日志文件最大100MB，超过后拆分文件
+      },
+    "max-concurrent-downloads":10,
+    "max-concurrent-uploads":5
+  }
+```
+- 修改完后要重启 docker 服务
+  - `sudo systemctl daemon-reload`
+  - `sudo systemctl restart docker`
+  - `sudo systemctl status docker`  查看docker状态  判断是否在运行
 
 ## 案例
 

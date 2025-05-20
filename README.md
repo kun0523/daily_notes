@@ -75,6 +75,8 @@ take notes about coding
     - ragflow  
     - RL（PPO  DPO  GRPO）
     - docker vllm to inference LLM/VLM(Qwen) for screenshot of account
+- 模型评测
+  - EvalScope  阿里团队
 ---
 
 - 五一
@@ -82,6 +84,8 @@ take notes about coding
   - n8n workflow  / compare to dify
   - RAGFlow 
   - unsloth fine tune llm  vlm  / compare to xtuner
+
+- 0430 把n8n跑起来，跑个小案例
 
 - TODO
   - python unicorn / fastapi (简单的启服务，多并发调用)
@@ -233,6 +237,13 @@ take notes about coding
 4. 大模型微调
 5. 视觉大模型应用
   
-
-
+- vscode
+  - 打开命令面板：ctrl+shift+p
+  - 打开终端： ctrl+`
+  - 多行上下移动：alt+up/down
+  - 多个光标： alt+鼠标点击
+  - 选取多个相同的元素：ctrl+D
+  - 选取所有相同元素：ctrl+shift+L
+  - 光标跳到句首/尾：ctrl+left/right
+  - 查找类或方法的定义：ctrl+鼠标点击 / F12
 

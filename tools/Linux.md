@@ -216,6 +216,15 @@ kill | 发送信号到指定的进程，通常用于杀死进程 | `kill PID`，
 - `https://www.ruanyifeng.com/blog/2019/10/tmux.html`  教程
 
 ### `conda`
+- 安装
+  ```bash
+  mkdir -p ~/miniconda3
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+  rm ~/miniconda3/miniconda.sh
+
+  source ~/miniconda3/bin/activate  # 激活环境  把这条写入 .bashrc 以后新开的窗口都可以用conda
+  ```
 - `conda --version` 查看版本信息
 - 设置国内镜像
   ```
@@ -280,6 +289,11 @@ kill | 发送信号到指定的进程，通常用于杀死进程 | `kill PID`，
   - `StrictHostKeyChecking=no UserKnownHostsFile=/dev/null`  绕过指纹检查
 - 输入登录密码： 密码是Linux登录用户的密码，也可以采用公钥的方式登录
   
+## FinalShell 连接远程服务器
+- 通过配置：主机地址，端口号，登录的用户名和密码，即可通过SSH连接远程服务器
+- 下载地址：`https://www.hostbuf.com/`
+- ![FinalShell配置过程](../image_resources/FinalShell_config.png)
+
 ## vscode 使用 SSH 连接
 - vscode 安装 `Rmote-SSH`
 - `Romote Explorer` >> `Remotes Tunnels/SSH` >> `+ New Remote` >> 输入上述登录命令 >> connect >> 输入密码
