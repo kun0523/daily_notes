@@ -36,8 +36,54 @@
 5. 配置开启自启
    - `sudo systemctl enable docker`
 
+6. 更换镜像源
+   1. 如果在使用`docker pull`时报错:`docker: Error response from daemon: Get "https://registry-1.docker.io/v2/": context deadline exceeded` 可能是访问镜像源的问题，可以更换国内源
+   2. ```json
+      {
+        "registry-mirrors" : ["https://docker.registry.cyou",
+          "https://docker-cf.registry.cyou",
+          "https://dockercf.jsdelivr.fyi",
+          "https://docker.jsdelivr.fyi",
+          "https://dockertest.jsdelivr.fyi",
+          "https://mirror.aliyuncs.com",
+          "https://dockerproxy.com",
+          "https://mirror.baidubce.com",
+          "https://docker.m.daocloud.io",
+          "https://docker.nju.edu.cn",
+          "https://docker.mirrors.sjtug.sjtu.edu.cn",
+          "https://docker.mirrors.ustc.edu.cn",
+          "https://mirror.iscas.ac.cn",
+          "https://docker.rainbond.cc",
+          "https://do.nark.eu.org",
+          "https://dc.j8.work",
+          "https://dockerproxy.com",
+          "https://gst6rzl9.mirror.aliyuncs.com",
+          "https://registry.docker-cn.com",
+          "http://hub-mirror.c.163.com",
+          "http://mirrors.ustc.edu.cn/",
+          "https://mirrors.tuna.tsinghua.edu.cn/",
+          "http://mirrors.sohu.com/" 
+      ],
+        "insecure-registries" : [
+        "registry.docker-cn.com",
+        "docker.mirrors.ustc.edu.cn"
+        ],
+        "debug": true,
+        "experimental": false,
+        "log-driver": "json-file",
+        "max-concurrent-downloads":10,
+        "max-concurrent-uploads":5,
+        "runtimes": {
+            "nvidia": {
+                "args": [],
+                "path": "nvidia-container-runtime"
+            }
+        }
+      }
+      ```
 
 ## `Image` 管理
+- `Image` 镜像，相当于一个运行环境的快照，可以把自己调试好的环境，推送到DockerHub，在其他地方拉取后直接使用；
 - `docker pull <image>` 从Docker Hub拉取指定镜像
 - `docker images`  查看当前本地有的镜像
 - `docker rmi <image>`  删除指定的镜像
@@ -46,12 +92,58 @@
   - 每次执行 `docker run` 都会创建一个**新的容器实例**
   - `docker run -d`  以后台模式运行
   - `docker run -it`  以交互模式运行
+- `docker search <image_name>` 从DockerHub中搜索指定的镜像
+
+### 使用`dockerfile`创建image
+- 一个简单dockerfile：
+```dockerfile
+FROM ubuntu:22.04
+CMD ["echo", "Hello From my first docker demo"]
+```
+- `docker build -t <image_name> .`
+- `docker tag <curr_image_name> <docker_hub_username>/<new_image_name>:<tag_id>`
+
+### 推送到DockerHub
+- 通过代理访问DockerHub
+  - `vim /etc/docker/daemon.json`  新增proxy 配置
+  ```json
+    "proxies":{
+	    "http-proxy": "http://proxy_server:port",
+	    "https-proxy": "http://proxy_server:port"
+    }
+  ```
+- `docker-credential-pass`创建公钥
+  - 下载：`https://github.com/docker/docker-credential-helpers/releases/download/v0.6.0/docker-credential-pass-v0.6.0-amd64.tar.gz`
+  - `tar -xf docker-credential-pass-v0.6.0-amd64.tar.gz`
+  - `chmod u+x docker-credential-pass`
+  - `mv docker-credential-pass /usr/bin/`  方便命令调用
+  - `gpg --generate-key`  用来产生一对新的GPG密钥对
+  - `pass init gpg_id`  
+    - `pass` 是密码管理器
+- 在DockerHub上创建密码token
+- `docker login -u dockerhub_username`
+- `docker tag <curr_image_name> <dockerhub_username>/<image_name>:<tag_id>`
+- `docker push <dockerhub_username>/<image_name>:<tag_id>` 就可以在DockerHub 自己的仓库中看到上传的镜像
+- `docker pull <dockerhub_username>/<image_name>:<tag_id>` 拉取上传的镜像文件
 
 
 ## `Container` 管理
 ![容器的生命周期](../image_resources/container_lifecycle.png)
+- `docker run -d -p 8080:80 --name web-server nginx`
+  - 根据镜像的名称，启动容器
+  - 不解析镜像名称后的参数，所以参数要写在镜像名称之前
+  - `-d`  detach
+  - `-p`  HostPort:ServerPort 本地端口：容器中服务的端口
+  - `--name` ContainerName
+  - `docker run` = `docker create` + `docker start`
+
 - `docker ps`  列出当前正在运行的容器
   - `docker ps -a`  列出所有容器，包括停止状态的
+
+- 停止容器：
+  - `docker stop 容器名称` 通过发送stop信号，来停止容器，资源回收更好
+  - `docker kill 容器名称` 直接关闭进程，如果内存中还有数据，则直接丢失
+
 - `docker start <container>`  启动已经停止的容器
   - 继续使用已经存在的容器实例
 - `docker stop <container_id>`  停止指定的容器
@@ -93,6 +185,12 @@
   - 但这也意味这容器之间的隔离性较低；
 - `Overlay`
   - 简介：用于创建跨多个Docker宿主机的容器网络，它允许不同宿主机上的容器之间的通过容器网络进行通信；
+
+- 在容器中使用`apt-get update` 报错：`Failed to fetch http://deb.debian.org/debian/dists/bookworm-updates/InRelease  Unable to connect to 127.0.0.1:7899`
+  - 代理设置错误，继承了主机的代理设置，需要把代理设置清空
+  - `export http_proxy=`
+  - `export https_proxy=`
+  - 将代理清空后即可正常进行
   
 ## 使用`SSH`
 
