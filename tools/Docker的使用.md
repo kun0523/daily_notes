@@ -154,8 +154,19 @@ CMD ["echo", "Hello From my first docker demo"]
 - 停止所有在运行的容器：`docker stop $(docker ps -q)`
 - 删除所有容器：`docker rm $(docker ps -aq)`
 - 退出docker运行环境 `ctrl+d` 
+- `docker stats` 查看各个容器对资源的使用情况
+
+## 环境变量
+
+- 在dockerfile中可以直接设定环境变量：`ENV PORT=8080`
+- 可以在创建容器时，传入环境变量值：`docker run -e PORT=3000`
+- 也可以在 `.env` 文件中设定环境变量值，并在创建容器时指定环境变量文件：`docker run --env-file .env`
+- 注意！`.env` 往往环境变量文件中常常包含隐私信息，所以要避免打包到镜像中！！！要在`.dockerignore`中进行屏蔽：`**/.env*`
 
 ## 数据卷
+
+- 本地挂载卷  Bind Volume：将主机本地的路径映射到容器内
+- 命名卷 Named Volume：优势是，可以多个容器绑定同一个Volume，当Volume中内容发送改变时，多个容器同时改变
 
 - 为什么用数据卷：
   - 持久：数据卷能确保容器删除后数据不会丢失，即使容器停止或删除后，数据仍然保留在数据卷中；
@@ -175,6 +186,7 @@ CMD ["echo", "Hello From my first docker demo"]
   - `docker run -d -v /path/in/host:/path/in/container my_image`
 
 ## 网络
+- `docker network ls` 查看运行中的容器的网络类型
 - `Bridge`
   - 简介：Docker默认使用`bridge`模式来创建容器网络，每个docker容器都会连到默认的`bridge`网络上
   - 特点：在这种模式下，**容器之间默认是隔离的**，但可以通过配置端口映射来互相通信
@@ -183,8 +195,12 @@ CMD ["echo", "Hello From my first docker demo"]
   - 简介：在`host`模式下，容器共享宿主机的网络命名空间，意味着容器可以直接访问宿主机的网络接口
   - 在这种模式下，容器就像直接在宿主机上运行的进程一样，可以直接访问外部网络而不需要特别的设置；
   - 但这也意味这容器之间的隔离性较低；
+  - 当主机有使用代理时，使用该模式下，容器中可以直接使用主机的代理服务器
 - `Overlay`
   - 简介：用于创建跨多个Docker宿主机的容器网络，它允许不同宿主机上的容器之间的通过容器网络进行通信；
+
+- `docker build` 时，因本地的代理导致的库安装失败：
+  - `docker build --network=host -t <image_name>:v0.1 .`
 
 - 在容器中使用`apt-get update` 报错：`Failed to fetch http://deb.debian.org/debian/dists/bookworm-updates/InRelease  Unable to connect to 127.0.0.1:7899`
   - 代理设置错误，继承了主机的代理设置，需要把代理设置清空
@@ -232,6 +248,12 @@ CMD ["echo", "Hello From my first docker demo"]
   - `sudo systemctl daemon-reload`
   - `sudo systemctl restart docker`
   - `sudo systemctl status docker`  查看docker状态  判断是否在运行
+
+## Docker优化
+
+### 优化镜像大小
+- `docker history <image_name>`  可以查看创建该image的过程，以及每一步镜像文件的大小
+- 选取影响最大的几步进行优化
 
 ## 案例
 
